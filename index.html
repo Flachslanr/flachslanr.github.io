@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rastreador de Hábitos</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#4f46e5" />
+<style>
+body { font-family: system-ui, sans-serif; margin: 20px; background: #f4f4f5; color: #18181b; }
+.card { background: white; padding: 16px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+button { padding: 8px 12px; border: none; background: #4f46e5; color: white; border-radius: 4px; cursor: pointer; }
+button:disabled { background: #a5f3fc; }
+input[type="number"] { width: 60px; padding: 6px; }
+</style>
+</head>
+<body>
+<h1>Mi Progreso</h1>
+<div id="app"></div>
+
+<script>
+// --- PERSISTENCIA DE FECHA DE INICIO (BUG FIX) ---
+function getOrSetStartDate() {
+let storedDate = localStorage.getItem("app_start_date");
+if (!storedDate) {
+storedDate = new Date().toISOString().split("T")[0];
+localStorage.setItem("app_start_date", storedDate);
+}
+return storedDate;
+}
+
+const START_DATE = getOrSetStartDate();
+
+// --- CONFIGURACIÓN DE HÁBITOS ---
+const habits = [
+{ id: "python", name: "Python", type: "duration", target: 45, step: 15, current: 0, weight: 3 },
+{ id: "read", name: "Leer", type: "duration", target: 30, step: 15, current: 0, weight: 2 },
+{ id: "water", name: "Tomar Agua", type: "boolean", completed: false, weight: 1 }
+];
+
+function render() {
+const app = document.getElementById("app");
+app.innerHTML = `<p><strong>Fecha de inicio:</strong> ${START_DATE}</p>`;
+
+habits.forEach((habit, index) => {
+const div = document.createElement("div");
+div.className = "card";
+
+if (habit.type === "duration") {
+div.innerHTML = `
+<h3>${habit.name} (${habit.weight} XP)</h3>
+<p>Meta: ${habit.target} min | Actual: ${habit.current} min</p>
+<button onclick="updateDuration(${index}, -${habit.step})">-${habit.step}m</button>
+<button onclick="updateDuration(${index}, ${habit.step})">+${habit.step}m</button>
+`;
+} else {
+div.innerHTML = `
+<h3>${habit.name} (${habit.weight} XP)</h3>
+<button onclick="toggleHabit(${index})">${habit.completed ? 'Completado ✓' : 'Marcar'}</button>
+`;
+}
+app.appendChild(div);
+});
+}
+
+function updateDuration(index, amount) {
+habits[index].current = Math.max(0, habits[index].current + amount);
+render();
+}
+
+function toggleHabit(index) {
+habits[index].completed = !habits[index].completed;
+render();
+}
+
+render();
+
+// Registrar Service Worker para soporte PWA
+if ("serviceWorker" in navigator) {
+navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+</script>
+</body>
+</html>
