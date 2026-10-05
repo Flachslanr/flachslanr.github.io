@@ -142,12 +142,13 @@ main {padding:0 16px;max-width:640px;margin:auto}
 
 /* Bottom Navigation */
 .bottom-nav {position:fixed;z-index:30;bottom:0;left:0;right:0;background:#12141af5;border-top:1px solid var(--line);padding:8px calc(8px + env(safe-area-inset-bottom));backdrop-filter:blur(12px)}
-.nav-inner {max-width:640px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.nav-inner {max-width:640px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
 .nav-btn {background:none;border:0;color:var(--faint);padding:8px;display:flex;flex-direction:column;gap:4px;align-items:center;cursor:pointer;border-radius:8px;transition:all .2s}
 .nav-btn:hover {background:var(--surface-2)}
 .nav-btn.active {color:var(--accent);background:var(--surface-2)}
 .nav-btn span:first-child {font-size:20px}
 .nav-btn span:last-child {font:9px 'JetBrains Mono';text-transform:uppercase}
+a.nav-btn {text-decoration:none}
 
 /* Toast */
 .toast {position:fixed;left:50%;bottom:90px;transform:translate(-50%,15px);opacity:0;pointer-events:none;background:var(--surface-3);border:1px solid var(--line);padding:10px 16px;border-radius:8px;font:10px 'JetBrains Mono';z-index:50;transition:.2s;max-width:90%}
@@ -296,6 +297,10 @@ main {padding:0 16px;max-width:640px;margin:auto}
 <span>✦</span>
 <span>Motivación</span>
 </button>
+<a class="nav-btn" href="/entreno.html">
+<span>🏋️</span>
+<span>Entreno</span>
+</a>
 </div>
 </nav>
 
@@ -859,7 +864,7 @@ function render() {
 }
 
 // Navigation
-$$('.nav-btn').forEach(btn => {
+$$('.nav-btn[data-view]').forEach(btn => {
   btn.onclick = () => switchView(btn.dataset.view);
 });
 

@@ -1,6 +1,7 @@
-// Service worker de Estoico — cachea el shell de la app para que abra offline.
-// Subí la versión del cache cada vez que cambies index.html para forzar la actualización.
-const CACHE_NAME = 'estoico-v1';
+// Service worker del sitio (Estoico + Entreno): hace que ambas abran sin conexión.
+// Estrategia "red primero": con internet siempre trae la última versión publicada;
+// sin internet usa la copia guardada. Subí la versión si cambiás la lista de archivos.
+const CACHE_NAME = 'estoico-v3';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -8,21 +9,22 @@ const APP_SHELL = [
   '/icon-192.png',
   '/icon-512.png',
   '/icon-maskable-512.png',
-  '/favicon.ico'
+  '/favicon.ico',
+  '/entreno.html',
+  '/entreno.css',
+  '/entreno-app.js',
+  '/entreno-programa.js',
+  '/entreno-store.js'
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))))
   );
   self.clients.claim();
 });
@@ -30,20 +32,21 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
-
-  // Navegación (abrir la app): intenta red primero, si no hay conexión sirve el shell cacheado.
-  if (req.mode === 'navigate') {
-    event.respondWith(
-      fetch(req).catch(() => caches.match('/index.html'))
-    );
-    return;
-  }
-
-  // Resto de assets propios: cache primero, red como respaldo.
   const url = new URL(req.url);
-  if (url.origin === self.location.origin) {
-    event.respondWith(
-      caches.match(req).then((cached) => cached || fetch(req))
-    );
-  }
+  if (url.origin !== self.location.origin) return;
+
+  event.respondWith(
+    fetch(req)
+      .then((res) => {
+        if (res.ok) { const copy = res.clone(); caches.open(CACHE_NAME).then((c) => c.put(req, copy)); }
+        return res;
+      })
+      .catch(() =>
+        caches.match(req, { ignoreSearch: true }).then((hit) => {
+          if (hit) return hit;
+          if (req.mode === 'navigate') return caches.match(url.pathname.startsWith('/entreno') ? '/entreno.html' : '/index.html');
+          return Response.error();
+        })
+      )
+  );
 });
