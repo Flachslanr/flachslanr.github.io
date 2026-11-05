@@ -37,7 +37,6 @@ h2{font-size:26px} h3{font-size:19px}
 p{margin:0}
 
 /* ---------- Próxima sesión y selector ---------- */
-.next{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .chip{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 4px;font-size:13px;font-weight:600;display:grid;gap:4px;justify-items:center;color:var(--dim)}
 .chip i{width:8px;height:8px;border-radius:50%;background:var(--c)}

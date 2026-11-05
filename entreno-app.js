@@ -2,17 +2,17 @@
 // ENTRENO — interfaz
 // =====================================================================
 import { SEMANAS, SECUENCIA, DIAS, EJ, ESCALERA, fase, rx, ytUrl, esDescarga } from './entreno-programa.js';
-import { S, guardar, guardarSesion, borrarSesion, ordenadas, ultimaDe, mejorDe, serieDe, exportar, importar, marcarEnEstoico } from './entreno-store.js';
+import { S, guardar, guardarSesion, borrarSesion, ordenadas, ultimaDe, mejorDe, serieDe, exportar, leerCopia, aplicarCopia, marcarEnEstoico, cicloEstoico } from './entreno-store.js';
+const SH = window.EstoicoShared;
 
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const hoyISO = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const hoyISO = () => SH.dateKey();
 const fmt = (iso) => { const [, m, d] = iso.split('-'); return `${d}/${m}`; };
 const mmss = (s) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
 
 function semanaActual() {
-  const ini = new Date(S.inicio + 'T00:00:00'), now = new Date(); now.setHours(0, 0, 0, 0);
-  return Math.min(SEMANAS, Math.max(1, Math.floor((now - ini) / (7 * 864e5)) + 1));
+  return Math.min(SEMANAS, Math.max(1, SH.weekNumber(S.inicio)));
 }
 function proxima() {
   const u = ordenadas()[0];
@@ -80,7 +80,7 @@ function tarjeta(id, w, dv) {
   let h = `<article class="ex"><div class="ex-head"><div><div class="ex-name">${esc(e.n)}</div><div class="rx">${esc(r.texto)}</div></div>
     <a class="yt" href="${ytUrl(id)}" target="_blank" rel="noopener">${YT_ICON}Ver</a></div>
     <p class="cue">${esc(e.c)}</p>`;
-  if (sug) { const [c, l] = TIP[sug.tipo]; h += `<div class="tip" style="--t:${c}">${esc(sug.txt).replace(/^(Subí|Mantené|Seguí):/, `<b>$1:</b>`)}</div>`; }
+  if (sug) { const [c] = TIP[sug.tipo]; h += `<div class="tip" style="--t:${c}">${esc(sug.txt).replace(/^(Subí|Mantené|Seguí):/, `<b>$1:</b>`)}</div>`; }
   if (e.u === 'ok') {
     h += `<label class="check"><input type="checkbox" data-ex="${id}" data-i="0" ${dv[0] ? 'checked' : ''}> Hecho</label>`;
   } else {
@@ -150,7 +150,7 @@ function timer(sec, lbl) {
 function tick() {
   const r = Math.max(0, Math.ceil((T.end - Date.now()) / 1000));
   $('#t-time').textContent = mmss(r);
-  if (r === 0 && !T.sonado) { T.sonado = true; $('#timer').classList.add('done'); $('#t-lbl').textContent = 'A la próxima serie'; beep(); }
+  if (r === 0 && !T.sonado) { T.sonado = true; clearInterval(T.iv); $('#timer').classList.add('done'); $('#t-lbl').textContent = 'A la próxima serie'; beep(); }
 }
 $('#t-plus').onclick = () => { T.end = Math.max(T.end, Date.now()) + 15000; T.sonado = false; $('#timer').classList.remove('done'); clearInterval(T.iv); T.iv = setInterval(tick, 250); tick(); };
 $('#t-stop').onclick = () => { clearInterval(T.iv); $('#timer').hidden = true; };
@@ -260,23 +260,27 @@ $('#view-progreso').addEventListener('click', (ev) => {
 
 // ---------- Vista: ajustes ----------
 function renderAjustes() {
-  const estoico = (() => { try { return JSON.parse(localStorage.getItem('trivium.v2') || 'null'); } catch (e) { return null; } })();
+  const estoico = cicloEstoico();
+  const distinto = estoico?.cycleStart && estoico.cycleStart !== S.inicio;
   $('#view-ajustes').innerHTML = `
   <div class="card" style="display:grid;gap:10px"><p class="label">Ciclo</p>
     <div class="form"><label>Inicio del programa<input type="date" id="inicio" value="${esc(S.inicio)}"></label><button class="btn" id="set-inicio" type="button">Guardar</button></div>
-    <p class="faint" style="font-size:12px">La semana del programa se calcula desde esta fecha.</p></div>
+    <p class="faint" style="font-size:12px">La semana del programa se calcula desde esta fecha.</p>${distinto ? `
+    <p class="dim" style="font-size:13px">Tu ciclo de Estoico empezó el ${fmt(estoico.cycleStart)}, así que las dos apps muestran semanas distintas.</p>
+    <button class="btn" id="usar-estoico" type="button">Usar el inicio de Estoico</button>` : ''}</div>
   <div class="card" style="display:grid;gap:10px"><p class="label">Copia de respaldo</p>
     <p class="dim" style="font-size:13px">Tus datos viven solo en este teléfono. Exportá una copia cada tanto y guardala en Archivos o mandátela por mail.</p>
     <div class="row"><button class="btn primary" id="exp" type="button">Exportar copia</button><button class="btn" id="imp-btn" type="button">Importar copia</button></div>
     <input type="file" id="imp-file" accept=".json,application/json,text/plain" hidden>
     <textarea id="exp-txt" readonly hidden></textarea></div>
   <div class="card" style="display:grid;gap:6px"><p class="label">Estoico</p>
-    <p class="dim" style="font-size:13px">${estoico && estoico.cycleStart ? `Conectado. Ciclo de Estoico iniciado el ${fmt(estoico.cycleStart)}. Cada sesión guardada marca "Entrenar" ese día.` : 'Todavía no encuentro un ciclo de Estoico en este teléfono. Abrí Entreno desde el botón de Estoico para que compartan datos.'}</p></div>
+    <p class="dim" style="font-size:13px">${estoico && estoico.cycleStart ? `Conectado. Ciclo de Estoico iniciado el ${fmt(estoico.cycleStart)}. Cada sesión guardada marca "Entrenar" ese día.` : 'Todavía no hay un ciclo de Estoico en este teléfono. Empezá uno en Estoico y cada sesión que guardes va a marcar "Entrenar".'}</p></div>
   <p class="faint" style="font-size:11px;text-align:center;font-family:var(--mono)">Entreno v1.0 · ${S.sesiones.length} sesiones guardadas</p>`;
 }
 $('#view-ajustes').addEventListener('click', async (ev) => {
   const id = ev.target.id;
   if (id === 'set-inicio') { const v = $('#inicio').value; if (v) { S.inicio = v; guardar(); toast('Inicio actualizado'); renderAll(); } }
+  if (id === 'usar-estoico') { const c = cicloEstoico()?.cycleStart; if (c) { S.inicio = c; guardar(); toast('Inicio igualado al de Estoico'); renderAll(); } }
   if (id === 'exp') {
     const txt = exportar(), nombre = `entreno-${hoyISO()}.json`;
     try {
@@ -294,8 +298,12 @@ $('#view-ajustes').addEventListener('click', async (ev) => {
 });
 $('#view-ajustes').addEventListener('change', async (ev) => {
   if (ev.target.id !== 'imp-file' || !ev.target.files[0]) return;
-  try { const n = importar(await ev.target.files[0].text()); toast(`Copia importada · ${n} sesiones`); renderAll(); }
-  catch (e) { toast(e.message || 'No se pudo leer el archivo'); }
+  try {
+    const d = leerCopia(await ev.target.files[0].text());
+    const ok = confirm(`La copia tiene ${d.sesiones.length} sesiones. Va a reemplazar ${S.sesiones.length === 1 ? 'la sesión' : 'las ' + S.sesiones.length + ' sesiones'} que tenés ahora en este teléfono. ¿Seguir?`);
+    if (ok) { const n = aplicarCopia(d); toast(`Copia importada · ${n} sesiones`); renderAll(); }
+  } catch (e) { toast(e.message || 'No se pudo leer el archivo'); }
+  ev.target.value = '';
 });
 
 // ---------- Navegación ----------

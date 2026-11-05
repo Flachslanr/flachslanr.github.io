@@ -5,7 +5,6 @@
 // =====================================================================
 
 export const SEMANAS = 12;
-export const INICIO_POR_DEFECTO = '2026-09-28';
 
 // Orden de la secuencia: la app propone siempre la sesión que sigue a la última guardada.
 export const SECUENCIA = ['push', 'pull', 'legs', 'upper'];

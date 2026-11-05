@@ -1,38 +1,36 @@
 // =====================================================================
 // DATOS: guardado local, copia de respaldo y puente con Estoico
 // =====================================================================
-import { INICIO_POR_DEFECTO } from './entreno-programa.js';
-
 const KEY = 'entreno.v1';
-const ESTOICO_KEY = 'trivium.v2';
+const SH = window.EstoicoShared;
 
-// Lo que ya registraste en la versión anterior (Barra y Paralelas).
-// Se carga una sola vez, la primera vez que abrís la app en un dispositivo sin datos.
-const IMPORTADO = {
-  sesiones: [
-    { id: '2026-09-28_pull', fecha: '2026-09-28', dia: 'pull', semana: 1, ts: 1790620117163, nota: 'Increible',
-      valores: { chin: [6, 6, 6], domlast: [4, 4, 3, 3, 2, 2], facepull: [12, 12, 12], lateral: [30, 30, 30], legraise: [8, 8, 8], remo: [10, 10, 10] } },
-    { id: '2026-09-29_push', fecha: '2026-09-29', dia: 'push', semana: 1, ts: 1790716632739, nota: 'Molestia en la muñeca izquierda! Desp flama',
-      valores: { flexdef: [15, 15, 15], fondos: [6, 7, 6, 6], hollow: [28, 28, 30], hs: [5, 3, 6, 4, 5, 2, 3, 2], lsit: [20, 20, 20, 18], negpress: [3, 3, 3, 3], pikepu: [4, 6, 6], rueda: [8, 8, 8] } },
-    { id: '2026-10-01_legs', fecha: '2026-10-01', dia: 'legs', semana: 1, ts: 1790857590016, nota: 'No llegue a hacer movilidad, pero me sentí genial! Puedo mas',
-      valores: { broad: [3, 6, 6, 6], bulgara: [8, 10, 10, 10], cmj: [5, 5, 10, 10], cosaca: [6, 6, null], curlfem: [12, 12, null], finisher: [5], rdl1: [8, 10, 10], skater: [6, 6, 10] } }
-  ],
-  pruebas: [{ fecha: '2026-09-28', reps: 6 }]
-};
+// Inicio por defecto para un teléfono nuevo: el del ciclo de Estoico si existe; si no, hoy.
+function inicioEstoico() {
+  try { return JSON.parse(localStorage.getItem(SH.ESTOICO_KEY) || 'null')?.cycleStart || null; }
+  catch (e) { return null; }
+}
 
 function base() {
-  return { v: 1, inicio: INICIO_POR_DEFECTO, nivel: 1, sesiones: [], pruebas: [], borradores: {} };
+  return { v: 1, inicio: inicioEstoico() || SH.dateKey(), nivel: 1, sesiones: [], pruebas: [], borradores: {} };
+}
+
+function respaldar(motivo) {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) localStorage.setItem(KEY + '.bak', JSON.stringify({ motivo, fecha: new Date().toISOString(), raw }));
+  } catch (e) { console.warn('No se pudo guardar la copia de seguridad', e); }
 }
 
 function leer() {
   try {
     const raw = localStorage.getItem(KEY);
     if (raw) return { ...base(), ...JSON.parse(raw) };
-  } catch (e) { console.warn('No se pudieron leer los datos', e); }
-  const s = base();
-  s.sesiones = IMPORTADO.sesiones.map((x) => ({ ...x }));
-  s.pruebas = IMPORTADO.pruebas.map((x) => ({ ...x }));
-  return s;
+  } catch (e) {
+    // Datos ilegibles: se guardan aparte y no se pisan hasta que registres algo nuevo.
+    console.warn('No se pudieron leer los datos', e);
+    respaldar('ilegible');
+  }
+  return base();
 }
 
 export const S = leer();
@@ -41,7 +39,6 @@ export function guardar() {
   try { localStorage.setItem(KEY, JSON.stringify(S)); return true; }
   catch (e) { console.warn(e); return false; }
 }
-guardar();
 
 // ---------- Sesiones ----------
 export function guardarSesion(doc) {
@@ -78,10 +75,18 @@ export function serieDe(exId) {
 export function exportar() {
   return JSON.stringify({ app: 'entreno', exportado: new Date().toISOString(), datos: S }, null, 2);
 }
-export function importar(texto) {
-  const j = JSON.parse(texto);
+// Lee y valida una copia sin aplicarla todavía
+export function leerCopia(texto) {
+  let j;
+  try { j = JSON.parse(texto); } catch (e) { throw new Error('El archivo no es una copia de Entreno.'); }
   const d = j && j.app === 'entreno' ? j.datos : null;
   if (!d || !Array.isArray(d.sesiones)) throw new Error('El archivo no es una copia de Entreno.');
+  return d;
+}
+// Reemplaza los datos actuales por la copia (antes guarda un respaldo de lo actual)
+export function aplicarCopia(d) {
+  respaldar('antes-de-importar');
+  Object.keys(S).forEach((k) => delete S[k]);
   Object.assign(S, base(), d);
   guardar();
   return S.sesiones.length;
@@ -89,34 +94,29 @@ export function importar(texto) {
 
 // ---------- Puente con Estoico ----------
 // Estoico guarda en 'trivium.v2' los días marcados de cada hábito por semana del ciclo.
-// Al guardar una sesión, marcamos "Entrenar" ese día. No tocamos el nivel: Estoico lo
-// recalcula cuando lo abrís y registrás.
+// Al guardar una sesión, marcamos "Entrenar" ese día. El nivel lo deriva Estoico
+// de las semanas cerradas, así que acá solo se actualizan cumplimiento y puntos.
+export function cicloEstoico() {
+  try { return JSON.parse(localStorage.getItem(SH.ESTOICO_KEY) || 'null'); }
+  catch (e) { return null; }
+}
+
 export function marcarEnEstoico(fecha) {
   try {
-    const raw = localStorage.getItem(ESTOICO_KEY);
-    if (!raw) return 'sin-estoico';
-    const st = JSON.parse(raw);
+    const st = cicloEstoico();
+    if (!st) return 'sin-estoico';
     if (!st.cycleStart) return 'sin-ciclo';
-    const dia = Math.floor((new Date(fecha + 'T12:00:00') - new Date(st.cycleStart + 'T12:00:00')) / 864e5);
-    if (dia < 0 || dia >= 84) return 'fuera-de-ciclo';
-    const semana = Math.floor(dia / 7) + 1, dw = dia % 7, k = 'week_' + semana;
+    const pos = SH.position(st.cycleStart, fecha);
+    if (!pos) return 'fuera-de-ciclo';
+    const k = 'week_' + pos.week;
     st.weeklyData = st.weeklyData || {};
     const wd = st.weeklyData[k] = st.weeklyData[k] || { habits: {}, points: 0, completion: 0 };
     wd.habits = wd.habits || {};
     const arr = wd.habits.entrenar = wd.habits.entrenar || [];
-    if (arr.includes(dw)) return 'ya-marcado';
-    arr.push(dw);
-    // Mismo cálculo de cumplimiento y puntos que hace Estoico (sin tocar el nivel)
-    const H = { python: [3, 4], lectura: [3, 4], entrenar: [4, 5], agua: [7, 5], alcohol: [7, 5], azucar: [5, 5], meditar: [4, 3], ayudar: [1, 3] };
-    let comp = 0, pts = 0;
-    Object.entries(H).forEach(([id, [obj, peso]]) => {
-      const n = (wd.habits[id] || []).length;
-      if (n >= obj) pts += peso;
-      comp += Math.min(100, Math.round((n / obj) * 100)) / 8;
-    });
-    wd.completion = Math.round(comp);
-    wd.points = pts;
-    localStorage.setItem(ESTOICO_KEY, JSON.stringify(st));
+    if (arr.includes(pos.dow)) return 'ya-marcado';
+    arr.push(pos.dow);
+    Object.assign(wd, SH.computeWeek(wd.habits));
+    localStorage.setItem(SH.ESTOICO_KEY, JSON.stringify(st));
     return 'marcado';
   } catch (e) {
     console.warn('No se pudo marcar en Estoico', e);
