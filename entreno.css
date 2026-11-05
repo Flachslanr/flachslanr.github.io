@@ -11,7 +11,7 @@ a{color:inherit}
 .top{position:sticky;top:0;z-index:20;background:linear-gradient(var(--bg) 88%,transparent);padding:calc(14px + env(safe-area-inset-top)) 16px 10px}
 .top-inner{max-width:640px;margin:auto}
 .top-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.back{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-decoration:none;padding:6px 10px;border:1px solid var(--line);border-radius:999px}
+.back{display:inline-flex;align-items:center;min-height:44px;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-decoration:none;padding:0 14px;border:1px solid var(--line);border-radius:999px}
 .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0}
 .brand{font-family:var(--serif);font-size:27px;font-weight:500;margin:2px 0 8px}
 .cycle{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--dim)}
@@ -56,7 +56,7 @@ details.warm ul{margin:10px 0 0;padding-left:18px;color:var(--dim);font-size:14p
 .ex-head{display:flex;justify-content:space-between;align-items:start;gap:10px}
 .ex-name{font-weight:600;font-size:16px}
 .rx{font-family:var(--mono);font-size:12px;color:var(--c);margin-top:3px}
-.yt{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text);text-decoration:none;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:6px 10px}
+.yt{flex:0 0 auto;display:inline-flex;min-height:44px;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text);text-decoration:none;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:0 14px}
 .yt svg{width:14px;height:14px;fill:#E46A5E}
 .cue{font-size:13px;color:var(--dim)}
 .prev{font-size:12px;color:var(--faint)} .prev b{color:var(--dim);font-weight:600}
@@ -70,13 +70,13 @@ details.warm ul{margin:10px 0 0;padding-left:18px;color:var(--dim);font-size:14p
 .sets.wide input{width:84px}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .unit{font-family:var(--mono);font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
-.btn{border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:9px 12px;font-weight:600;font-size:13px}
+.btn{min-height:44px;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:9px 12px;font-weight:600;font-size:13px}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);padding:13px 18px;font-size:15px}
 .btn.ghost{background:none}
 .btn.danger{color:var(--danger)}
 .check{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px}
 .check input{width:24px;height:24px;accent-color:var(--ok)}
-textarea,.field{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:10px}
+textarea,.field{min-height:44px;width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:10px}
 textarea{min-height:70px;resize:vertical}
 .switch{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;color:var(--dim)}
 .switch input{width:20px;height:20px;accent-color:var(--accent)}
@@ -113,7 +113,7 @@ td{color:var(--dim)}
 .ladder .n .icon{width:20px;height:20px;stroke-width:2.5}
 .form{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
 .form label{display:grid;gap:4px;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint)}
-.form input,.form select{border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:9px 10px;min-width:0}
+.form input,.form select{min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:9px 10px;min-width:0}
 .ladder{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .ladder button{width:100%;text-align:left;display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px}
 .ladder .n{font-family:var(--serif);font-size:20px;text-align:center;color:var(--faint)}

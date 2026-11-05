@@ -1,7 +1,7 @@
 /* Estoico — estilos propios. Tokens y base en shared.css */
-body {min-height:100vh;padding-bottom:100px}
+body {min-height:100vh;min-height:100dvh;padding-bottom:calc(100px + env(safe-area-inset-bottom))}
 
-.top {padding:20px;position:sticky;top:0;background:linear-gradient(var(--bg) 86%,transparent);z-index:10}
+.top {padding:calc(env(safe-area-inset-top) + 16px) calc(20px + env(safe-area-inset-right)) 16px calc(20px + env(safe-area-inset-left));position:sticky;top:0;background:linear-gradient(var(--bg) 86%,transparent);z-index:10}
 .eyebrow {font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 8px}
 .brand {font-family:var(--serif);font-size:27px;font-weight:500;margin:0 0 16px}
 .header-row {display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
@@ -12,6 +12,7 @@ body {min-height:100vh;padding-bottom:100px}
 .progress-label {font-size:12px;color:var(--dim);font-family:var(--mono);display:flex;justify-content:space-between}
 
 main {padding:0 16px;max-width:640px;margin:auto}
+.top > * {max-width:608px;margin-left:auto;margin-right:auto}
 .view {display:none}
 .view.active {display:block}
 .greeting {margin:0 0 18px}
@@ -24,8 +25,7 @@ main {padding:0 16px;max-width:640px;margin:auto}
 
 /* Week Navigation */
 .week-nav {display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px}
-.week-nav button {background:var(--surface-2);border:1px solid var(--line);color:var(--text);padding:8px 12px;border-radius:8px;font-size:12px}
-.week-nav button:hover {background:var(--surface-3)}
+.week-nav button {min-height:44px;background:var(--surface-2);border:1px solid var(--line);color:var(--text);padding:8px 12px;border-radius:8px;font-size:12px}
 .week-nav button:disabled {opacity:.35;cursor:default}
 .week-nav button.today {background:var(--accent);color:var(--on-accent);font-weight:600;border-color:var(--accent)}
 .week-info {font-size:12px;color:var(--dim);font-family:var(--mono)}
@@ -33,7 +33,6 @@ main {padding:0 16px;max-width:640px;margin:auto}
 /* Day Grid */
 .day-grid {display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:18px}
 .day-btn {min-height:64px;padding:6px 0;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:10px;font:12px var(--mono);cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .2s}
-.day-btn:hover {background:var(--surface-3)}
 .day-btn.active {background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:600}
 .day-btn.today {outline:2px solid var(--accent);outline-offset:-1px}
 .day-name {font:12px var(--mono);opacity:.7;margin-bottom:2px}
@@ -49,14 +48,12 @@ main {padding:0 16px;max-width:640px;margin:auto}
 .habit-list {background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .habit-row {display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--line);transition:background .2s}
 .habit-row:last-child {border-bottom:0}
-.habit-row:hover {background:var(--surface-2)}
 .habit-icon {width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;color:var(--cat);background:color-mix(in srgb,var(--cat) 14%,transparent)}
 .habit-icon .icon {width:22px;height:22px}
 .habit-info {flex:1;min-width:0}
 .habit-name {font:14px var(--sans);font-weight:500;margin-bottom:3px}
 .habit-meta {font:12px var(--mono);color:var(--faint);display:flex;gap:8px;flex-wrap:wrap}
-.habit-check {width:32px;height:32px;border:2px solid var(--line);background:var(--surface-2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .2s;flex-shrink:0}
-.habit-check:hover {background:var(--surface-3)}
+.habit-check {width:44px;height:44px;border:2px solid var(--line);background:var(--surface-2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .2s;flex-shrink:0}
 .habit-check.done {background:var(--success);border-color:var(--success);color:var(--on-accent);font-weight:600}
 .habit-check .icon {width:18px;height:18px;stroke-width:2.5}
 .habit-check.editing-disabled {opacity:.5;cursor:not-allowed}
@@ -93,8 +90,7 @@ main {padding:0 16px;max-width:640px;margin:auto}
 .quote-text {font-family:var(--serif);font-size:18px;font-style:italic;line-height:1.6;margin-bottom:16px;color:var(--text)}
 .quote-author {font:12px var(--mono);color:var(--faint);text-transform:uppercase;letter-spacing:.1em}
 .quote-refresh {margin-top:20px}
-.quote-refresh button {background:var(--accent);color:var(--on-accent);border:0;padding:10px 20px;border-radius:8px;font-weight:600;font-size:12px}
-.quote-refresh button:hover {opacity:.9}
+.quote-refresh button {min-height:44px;background:var(--accent);color:var(--on-accent);border:0;padding:10px 20px;border-radius:8px;font-weight:600;font-size:12px}
 
 /* Cycle End Modal */
 .cycle-end-modal {position:fixed;top:0;left:0;right:0;bottom:0;background:#0009;display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
@@ -104,14 +100,13 @@ main {padding:0 16px;max-width:640px;margin:auto}
 .cycle-end-result {font:32px var(--serif);color:var(--accent);margin:16px 0;font-weight:600}
 .cycle-end-stats {background:var(--surface-2);border-radius:10px;padding:14px;margin:16px 0;font-size:12px}
 .cycle-end-button {display:flex;gap:8px;margin-top:20px}
-.cycle-end-button button {flex:1;padding:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:8px;font-weight:600;cursor:pointer}
+.cycle-end-button button {flex:1;min-height:44px;padding:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:8px;font-weight:600;cursor:pointer}
 .cycle-end-button button.primary {background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 
 /* Bottom Navigation */
-.bottom-nav {position:fixed;z-index:30;bottom:0;left:0;right:0;background:#12141af5;border-top:1px solid var(--line);padding:8px calc(8px + env(safe-area-inset-bottom));backdrop-filter:blur(12px)}
+.bottom-nav {position:fixed;z-index:30;bottom:0;left:0;right:0;background:#12141af5;border-top:1px solid var(--line);padding:8px 8px calc(8px + env(safe-area-inset-bottom));-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 .nav-inner {max-width:640px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
 .nav-btn {background:none;border:0;color:var(--faint);padding:8px;display:flex;flex-direction:column;gap:4px;align-items:center;cursor:pointer;border-radius:8px;transition:all .2s}
-.nav-btn:hover {background:var(--surface-2)}
 .nav-btn.active {color:var(--accent);background:var(--surface-2)}
 .nav-btn .icon {width:24px;height:24px}
 .nav-btn span {font-size:12px;font-weight:500}
@@ -125,13 +120,23 @@ a.nav-btn {text-decoration:none}
 .init-desc {font:13px var(--sans);color:var(--dim);margin:0 0 20px;line-height:1.5}
 .init-form {display:grid;gap:12px}
 .init-form input, .init-form label {font:inherit}
-.init-form input[type="date"] {background:var(--surface-2);border:1px solid var(--line);color:var(--text);padding:10px;border-radius:8px}
-.init-form button {padding:12px;background:var(--accent);color:var(--on-accent);border:0;border-radius:8px;font-weight:600;cursor:pointer}
-.init-form button:hover {opacity:.95}
+.init-form input[type="date"] {min-height:44px;background:var(--surface-2);border:1px solid var(--line);color:var(--text);padding:10px;border-radius:8px}
+.init-form button {min-height:44px;padding:12px;background:var(--accent);color:var(--on-accent);border:0;border-radius:8px;font-weight:600;cursor:pointer}
 
 @media (max-width:480px) {
   .day-grid {gap:4px}
   .day-btn {font-size:12px}
   .quote-card {padding:20px 16px;min-height:160px}
   .cycle-end-content {padding:20px}
+}
+
+/* Hover solo en dispositivos con mouse (evita estados pegados en iPhone) */
+@media (hover:hover) {
+  .week-nav button:hover {background:var(--surface-3)}
+  .day-btn:not(.active):hover {background:var(--surface-3)}
+  .habit-row:hover {background:var(--surface-2)}
+  .habit-check:not(.done):hover {background:var(--surface-3)}
+  .quote-refresh button:hover {opacity:.9}
+  .nav-btn:not(.active):hover {background:var(--surface-2)}
+  .init-form button:hover {opacity:.95}
 }

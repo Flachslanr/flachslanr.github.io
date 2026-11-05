@@ -115,7 +115,22 @@
   }
 
   // ---------- Service worker ----------
+  // Cuando se publica una versión nueva y toma el control con la app abierta,
+  // se ofrece recargar (no se recarga sola para no cortar lo que estés haciendo).
+  function showUpdate() {
+    if (document.getElementById('update-pill')) return;
+    const b = document.createElement('button');
+    b.id = 'update-pill';
+    b.type = 'button';
+    b.className = 'update-pill';
+    b.innerHTML = icon('refresh') + '<span>Hay una versión nueva · Actualizar</span>';
+    b.onclick = () => location.reload();
+    document.body.appendChild(b);
+  }
+
   if ('serviceWorker' in navigator) {
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) showUpdate(); });
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js').catch((err) => console.warn('No se pudo registrar el service worker:', err));
     });
