@@ -13,6 +13,18 @@
 <meta name="apple-mobile-web-app-title" content="Estoico">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Programa de calistenia de 4 días con registro de series.">
+<link rel="canonical" href="https://flachslanr.github.io/entreno.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Estoico">
+<meta property="og:locale" content="es_AR">
+<meta property="og:url" content="https://flachslanr.github.io/entreno.html">
+<meta property="og:title" content="Entreno — Estoico">
+<meta property="og:description" content="Programa de calistenia de 12 semanas con registro de series, descansos y récords.">
+<meta property="og:image" content="https://flachslanr.github.io/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Estoico: ciclos de 12 semanas de hábitos de mente, cuerpo y alma.">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -33,10 +45,10 @@
 </header>
 
 <main class="wrap">
-  <section class="view" id="view-sesion" aria-label="Sesión"></section>
-  <section class="view" id="view-plan" aria-label="Plan" hidden></section>
-  <section class="view" id="view-progreso" aria-label="Progreso" hidden></section>
-  <section class="view" id="view-ajustes" aria-label="Ajustes" hidden></section>
+  <section class="view" id="view-sesion" role="tabpanel" aria-labelledby="tab-sesion"></section>
+  <section class="view" id="view-plan" role="tabpanel" aria-labelledby="tab-plan" hidden></section>
+  <section class="view" id="view-progreso" role="tabpanel" aria-labelledby="tab-progreso" hidden></section>
+  <section class="view" id="view-ajustes" role="tabpanel" aria-labelledby="tab-ajustes" hidden></section>
 </main>
 
 <!-- Descanso: anillo que se vacía -->
@@ -53,7 +65,7 @@
 
 <!-- Hoja para cargar una serie -->
 <div class="scrim" id="scrim"></div>
-<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title">
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title" inert>
   <div class="grab" aria-hidden="true"></div>
   <p class="eyebrow" id="sh-ex">Ejercicio</p>
   <h2 class="sheet-title" id="sh-title" tabindex="-1">Serie 1</h2>
@@ -77,10 +89,10 @@
 
 <nav class="tabbar" aria-label="Secciones">
   <div class="tabbar-inner" role="tablist">
-    <button class="tab" role="tab" type="button" data-view="sesion" aria-selected="true"><svg class="icon" aria-hidden="true"><use href="#i-flame"/></svg><span>Sesión</span></button>
-    <button class="tab" role="tab" type="button" data-view="plan" aria-selected="false"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg><span>Plan</span></button>
-    <button class="tab" role="tab" type="button" data-view="progreso" aria-selected="false"><svg class="icon" aria-hidden="true"><use href="#i-trend"/></svg><span>Progreso</span></button>
-    <button class="tab" role="tab" type="button" data-view="ajustes" aria-selected="false"><svg class="icon" aria-hidden="true"><use href="#i-sliders"/></svg><span>Ajustes</span></button>
+    <button class="tab" role="tab" type="button" id="tab-sesion" data-view="sesion" aria-controls="view-sesion" aria-selected="true" tabindex="0"><svg class="icon" aria-hidden="true"><use href="#i-flame"/></svg><span>Sesión</span></button>
+    <button class="tab" role="tab" type="button" id="tab-plan" data-view="plan" aria-controls="view-plan" aria-selected="false" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg><span>Plan</span></button>
+    <button class="tab" role="tab" type="button" id="tab-progreso" data-view="progreso" aria-controls="view-progreso" aria-selected="false" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-trend"/></svg><span>Progreso</span></button>
+    <button class="tab" role="tab" type="button" id="tab-ajustes" data-view="ajustes" aria-controls="view-ajustes" aria-selected="false" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-sliders"/></svg><span>Ajustes</span></button>
   </div>
 </nav>
 

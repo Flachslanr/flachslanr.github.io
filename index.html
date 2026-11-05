@@ -30,11 +30,19 @@
 <link rel="apple-touch-startup-image" href="/splash/splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
 
 <!-- SEO / al compartir el link -->
-<meta name="description" content="Seguimiento de hábitos de mente, cuerpo y alma en ciclos de 12 semanas.">
-<meta property="og:title" content="Estoico — Hábitos">
-<meta property="og:description" content="Seguimiento de hábitos de mente, cuerpo y alma en ciclos de 12 semanas.">
+<meta name="description" content="Hábitos de mente, cuerpo y alma en ciclos de 12 semanas, con un registro de entrenamiento.">
+<link rel="canonical" href="https://flachslanr.github.io/">
 <meta property="og:type" content="website">
-<meta property="og:image" content="/icon-512.png">
+<meta property="og:site_name" content="Estoico">
+<meta property="og:locale" content="es_AR">
+<meta property="og:url" content="https://flachslanr.github.io/">
+<meta property="og:title" content="Estoico — 12 Semanas">
+<meta property="og:description" content="Hábitos de mente, cuerpo y alma en ciclos de 12 semanas, con un registro de entrenamiento.">
+<meta property="og:image" content="https://flachslanr.github.io/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Estoico: ciclos de 12 semanas de hábitos de mente, cuerpo y alma.">
+<meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,7 +65,7 @@
 <main class="wrap" id="main">
 
 <!-- REGISTRO -->
-<section class="view" id="view-registro" aria-label="Registro">
+<section class="view" id="view-registro" role="tabpanel" aria-labelledby="tab-registro">
 <div class="weeknav">
 <button class="iconbtn" id="prev-week" type="button" aria-label="Semana anterior"><svg class="icon" aria-hidden="true"><use href="#i-left"/></svg></button>
 <div class="weeknav-t" aria-live="polite">
@@ -82,7 +90,7 @@
 </section>
 
 <!-- PROGRESO -->
-<section class="view" id="view-progreso" aria-label="Progreso" hidden>
+<section class="view" id="view-progreso" role="tabpanel" aria-labelledby="tab-progreso" hidden>
 <div class="tiles" id="prog-tiles"></div>
 
 <div class="section-h"><h2>El ciclo, día por día</h2><span class="eyebrow" id="cycle-dates"></span></div>
@@ -97,7 +105,7 @@
 </section>
 
 <!-- RECORDÁ -->
-<section class="view" id="view-motivacion" aria-label="Recordá" hidden>
+<section class="view" id="view-motivacion" role="tabpanel" aria-labelledby="tab-motivacion" hidden>
 <figure class="card quote">
 <p class="eyebrow">Frase del día</p>
 <blockquote id="quote-text"></blockquote>
@@ -110,10 +118,10 @@
 
 <nav class="tabbar" aria-label="Secciones">
 <div class="tabbar-inner" role="tablist">
-<button class="tab" role="tab" type="button" data-view="registro" aria-selected="true"><svg class="icon" aria-hidden="true"><use href="#i-cal"/></svg><span>Registro</span></button>
-<button class="tab" role="tab" type="button" data-view="progreso" aria-selected="false"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg><span>Progreso</span></button>
-<button class="tab" role="tab" type="button" data-view="motivacion" aria-selected="false"><svg class="icon" aria-hidden="true"><use href="#i-quote"/></svg><span>Recordá</span></button>
-<a class="tab" href="/entreno.html"><svg class="icon" aria-hidden="true"><use href="#i-dumbbell"/></svg><span>Entreno</span></a>
+<button class="tab" role="tab" type="button" id="tab-registro" data-view="registro" aria-controls="view-registro" aria-selected="true" tabindex="0"><svg class="icon" aria-hidden="true"><use href="#i-cal"/></svg><span>Registro</span></button>
+<button class="tab" role="tab" type="button" id="tab-progreso" data-view="progreso" aria-controls="view-progreso" aria-selected="false" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg><span>Progreso</span></button>
+<button class="tab" role="tab" type="button" id="tab-motivacion" data-view="motivacion" aria-controls="view-motivacion" aria-selected="false" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-quote"/></svg><span>Recordá</span></button>
+<a class="tab" role="tab" href="/entreno.html" aria-selected="false" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-dumbbell"/></svg><span>Entreno</span></a>
 </div>
 </nav>
 
@@ -147,30 +155,35 @@
 <script src="/shared.js"></script>
 <script>
 'use strict';
-const { ESTOICO_KEY: KEY, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, cycleProgress, ring, CHECK_SVG, icon, toast, pop, countUp, confetti } = window.EstoicoShared;
+const { ESTOICO_KEY: KEY, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, cycleProgress, ring, CHECK_SVG, icon, toast, pop, countUp, confetti, tabs, dialog } = window.EstoicoShared;
 const VERSION = 2;
 
+// Solo estoicos, con la obra y el pasaje de donde sale cada frase.
+// Traducciones propias y breves, en voseo cuando la frase le habla al lector.
 const STOICS = [
-  ["No es que nos falte tiempo, sino que perdemos mucho.", "Séneca"],
-  ["Hay cosas que dependen de ti y cosas que no.", "Epicteto"],
-  ["La mejor respuesta es no parecerte a quien te hizo daño.", "Marco Aurelio"],
-  ["Se aprende a vivir durante toda la vida.", "Séneca"],
-  ["Vive bien quien vive conforme a la razón.", "Zenón de Citio"],
-  ["La riqueza consiste no en tener grandes posesiones, sino en tener pocas necesidades.", "Séneca"],
-  ["Tu propia serena mente es la única verdadera protección que posees.", "Séneca"],
-  ["No temas ni desees lo que no está en tu poder.", "Epicteto"],
-  ["La excelencia no es destino; es un hábito.", "Aristóteles"],
-  ["Incluso un reloj parado tiene razón dos veces al día.", "Marco Aurelio"],
-  ["La vida es larga si sabes cómo usarla.", "Séneca"],
-  ["Todo cuanto deseamos sucede después de que dejamos de esperarlo.", "Séneca"],
-  ["Lo que no está en tu control no debería perturbar tu paz.", "Marco Aurelio"],
-  ["El único camino hacia la paz es aceptar las cosas que no puedes cambiar.", "Séneca"],
-  ["Cada día es una nueva vida para quien sabe aprovecharlo.", "Séneca"],
-  ["La virtud es el único bien verdadero.", "Zenón de Citio"],
-  ["No es la cosa que te molesta, sino tu opinión sobre ella.", "Epicteto"],
-  ["Quien se conquista a sí mismo es más poderoso que quien conquista ciudades.", "Confucio"],
-  ["El que espera es quien trabaja.", "Séneca"],
-  ["Actúa de forma que podrías vivir eternamente así.", "Marco Aurelio"]
+  ["No es que tengamos poco tiempo, sino que perdemos mucho.", "Séneca", "De la brevedad de la vida, 1"],
+  ["La vida es larga si sabés usarla.", "Séneca", "De la brevedad de la vida, 2"],
+  ["Hay que aprender a vivir durante toda la vida.", "Séneca", "De la brevedad de la vida, 7"],
+  ["Mientras la postergamos, la vida pasa.", "Séneca", "Cartas a Lucilio, 1"],
+  ["No es pobre el que tiene poco, sino el que desea más.", "Séneca", "Cartas a Lucilio, 2"],
+  ["Enseñando, aprendemos.", "Séneca", "Cartas a Lucilio, 7"],
+  ["Sufrimos más en la imaginación que en la realidad.", "Séneca", "Cartas a Lucilio, 13"],
+  ["Ningún viento es favorable para quien no sabe a qué puerto va.", "Séneca", "Cartas a Lucilio, 71"],
+  ["Mientras estemos entre los hombres, cultivemos la humanidad.", "Séneca", "De la ira, III"],
+  ["De las cosas, unas dependen de nosotros y otras no.", "Epicteto", "Enquiridión, 1"],
+  ["No nos perturban las cosas, sino las opiniones que tenemos sobre ellas.", "Epicteto", "Enquiridión, 5"],
+  ["No pretendas que las cosas pasen como querés: querelas como pasan y vas a vivir en paz.", "Epicteto", "Enquiridión, 8"],
+  ["¿Hasta cuándo vas a esperar para exigirte lo mejor?", "Epicteto", "Enquiridión, 51"],
+  ["Nada grande se hace de golpe, ni siquiera un racimo de uvas o un higo.", "Epicteto", "Disertaciones, I 15"],
+  ["Primero decite quién querés ser; después hacé lo que tenés que hacer.", "Epicteto", "Disertaciones, III 23"],
+  ["Al amanecer, cuando te cueste levantarte, pensá: me levanto para hacer el trabajo de un ser humano.", "Marco Aurelio", "Meditaciones, V 1"],
+  ["El alma se tiñe del color de sus pensamientos.", "Marco Aurelio", "Meditaciones, V 16"],
+  ["Lo que se interpone en el camino se convierte en el camino.", "Marco Aurelio", "Meditaciones, V 20"],
+  ["La mejor venganza es no parecerte al que te hizo daño.", "Marco Aurelio", "Meditaciones, VI 6"],
+  ["Se necesita muy poco para vivir feliz.", "Marco Aurelio", "Meditaciones, VII 67"],
+  ["Basta de discutir cómo tiene que ser un hombre bueno. Selo.", "Marco Aurelio", "Meditaciones, X 16"],
+  ["Para la virtud, la práctica vale más que la teoría.", "Musonio Rufo", "Disertaciones, 5"],
+  ["Si hacés algo bueno con esfuerzo, el esfuerzo pasa y el bien queda.", "Musonio Rufo", "Fragmento 51"]
 ];
 
 const CATEGORIES = [
@@ -179,19 +192,20 @@ const CATEGORIES = [
   {id:'alma', label:'Alma', color:'var(--alma)'}
 ];
 
+// Doce estoicos en orden cronológico, de Zenón a Marco Aurelio
 const LEVELS = [
-  {num:1, name:'Cleantes', desc:'El Guardián'},
-  {num:2, name:'Diógenes', desc:'De Babilonia'},
-  {num:3, name:'Apolonio', desc:'De Tyana'},
-  {num:4, name:'Crisipo', desc:'El Lógico'},
-  {num:5, name:'Panaecio', desc:'El Puente'},
-  {num:6, name:'Posidonio', desc:'El Enciclopédico'},
-  {num:7, name:'Catón Viejo', desc:'El Severo'},
-  {num:8, name:'Catón Joven', desc:'El Íntegro'},
-  {num:9, name:'Quinto Musonio', desc:'El Maestro'},
-  {num:10, name:'Epicteto', desc:'El Liberador'},
-  {num:11, name:'Séneca', desc:'El Sabio'},
-  {num:12, name:'Marco Aurelio', desc:'El Emperador Filósofo'}
+  {num:1, name:'Zenón de Citio', desc:'Fundó la escuela en la Stoa Pintada de Atenas. Todo empieza acá.'},
+  {num:2, name:'Cleantes', desc:'Acarreaba agua de noche para poder estudiar de día.'},
+  {num:3, name:'Crisipo', desc:'Le dio a la escuela su sistema. Sin él no habría Stoa.'},
+  {num:4, name:'Diógenes de Babilonia', desc:'Llevó la filosofía a Roma como embajador de Atenas.'},
+  {num:5, name:'Panecio de Rodas', desc:'Bajó el estoicismo a la vida práctica de los romanos.'},
+  {num:6, name:'Posidonio', desc:'Estudió de todo: mareas, historia, geografía y el alma.'},
+  {num:7, name:'Catón el Joven', desc:'Íntegro hasta el final, aunque le costara todo.'},
+  {num:8, name:'Séneca', desc:'Escribió cartas sobre cómo vivir que todavía se leen.'},
+  {num:9, name:'Musonio Rufo', desc:'Enseñó que la filosofía se entrena como el cuerpo.'},
+  {num:10, name:'Epicteto', desc:'Nació esclavo y enseñó qué depende de nosotros.'},
+  {num:11, name:'Junio Rústico', desc:'Le acercó a Marco Aurelio las enseñanzas de Epicteto.'},
+  {num:12, name:'Marco Aurelio', desc:'Emperador que se escribía a sí mismo para ser mejor.'}
 ];
 
 const $ = s => document.querySelector(s);
@@ -400,7 +414,7 @@ function switchView(v) {
   state.currentView = v;
   save();
   $$('.view').forEach(x => { x.hidden = x.id !== 'view-' + v; });
-  $$('.tab[data-view]').forEach(x => x.setAttribute('aria-selected', x.dataset.view === v));
+  selectTab(v);
   if (changed) scrollTo({ top: 0 });
 
   if (v === 'registro') renderRegistro();
@@ -591,7 +605,9 @@ function renderMotivacion() {
 // ---------- Inicio y fin de ciclo ----------
 function showInitModal() {
   $('#start-date').value = dateKey();
+  if (!$('#init-modal').hidden) return;
   $('#init-modal').hidden = false;
+  let close = dialog($('#init-modal'), $('#start-cycle'));
 
   $('#start-cycle').onclick = () => {
     let dateStr = $('#start-date').value;
@@ -607,6 +623,7 @@ function showInitModal() {
     selectedDate = null;
     save();
     $('#init-modal').hidden = true;
+    close(false);
     render();
   };
 }
@@ -628,8 +645,12 @@ function showCycleEnd() {
   `;
 
   $('#cycle-end-modal').hidden = false;
+  let close = dialog($('#cycle-end-modal'), $('#view-summary'));
   state.cycleEndShown = true;
   save();
+
+  // Escape equivale a "Ver resumen"
+  $('#cycle-end-modal').onkeydown = e => { if (e.key === 'Escape') $('#view-summary').click(); };
 
   $('#new-cycle').onclick = () => {
     if (!confirm('¿Empezar un ciclo nuevo? El ciclo actual se guarda en el historial y el registro vuelve a cero.')) return;
@@ -641,6 +662,7 @@ function showCycleEnd() {
       weeklyData: state.weeklyData
     }]);
     $('#cycle-end-modal').hidden = true;
+    close(false);
     state = defaultState();
     state.archive = archive;
     displayWeek = null;
@@ -651,7 +673,9 @@ function showCycleEnd() {
 
   $('#view-summary').onclick = () => {
     $('#cycle-end-modal').hidden = true;
+    close(false);
     switchView('progreso');
+    $('#tab-progreso').focus({ preventScroll: true });
   };
 }
 
@@ -668,9 +692,7 @@ function render() {
 }
 
 // Navegación y eventos (se conectan una sola vez)
-$$('.tab[data-view]').forEach(btn => {
-  btn.onclick = () => switchView(btn.dataset.view);
-});
+const selectTab = tabs(switchView);
 $('#prev-week').onclick = () => { setDisplayWeek(getDisplayWeek() - 1); selectedDate = null; renderRegistro(); };
 $('#next-week').onclick = () => { setDisplayWeek(getDisplayWeek() + 1); selectedDate = null; renderRegistro(); };
 $('#day-grid').addEventListener('click', e => {

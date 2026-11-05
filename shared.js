@@ -196,6 +196,44 @@
     requestAnimationFrame(frame);
   }
 
+  // ---------- Accesibilidad ----------
+  // Pestañas de la barra inferior: aria-selected, foco itinerante y flechas.
+  // onSelect(vista) se llama al tocar o al moverse con el teclado.
+  // Devuelve select(vista) para marcar la pestaña activa desde la app.
+  function tabs(onSelect) {
+    const bar = document.querySelector('.tabbar');
+    const list = [...bar.querySelectorAll('[role="tab"]')];
+    const select = (v) => list.forEach((t) => {
+      const on = t.dataset.view === v;
+      t.setAttribute('aria-selected', on);
+      t.tabIndex = on ? 0 : -1;
+    });
+    bar.addEventListener('click', (ev) => { const b = ev.target.closest('[data-view]'); if (b) onSelect(b.dataset.view); });
+    bar.addEventListener('keydown', (ev) => {
+      const i = list.indexOf(document.activeElement);
+      let j = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: list.length - 1 }[ev.key];
+      if (i < 0 || j === undefined) return;
+      ev.preventDefault();
+      j = (j + list.length) % list.length;
+      list[j].focus();
+      if (list[j].dataset.view) onSelect(list[j].dataset.view);
+    });
+    return select;
+  }
+
+  // Diálogo modal: deja inerte el resto de la página, mueve el foco adentro
+  // y devuelve close(restaurar) para soltarlo y volver el foco a donde estaba.
+  function dialog(el, focusEl) {
+    const prev = document.activeElement;
+    const others = [...document.body.children].filter((c) => c !== el && !c.contains(el) && c.tagName !== 'SCRIPT' && !c.matches('.toast, .scrim, .update-pill'));
+    others.forEach((c) => { c.inert = true; });
+    (focusEl || el.querySelector('input, button, [tabindex]'))?.focus({ preventScroll: true });
+    return function close(restore = true) {
+      others.forEach((c) => { c.inert = false; });
+      if (restore && prev && document.contains(prev)) prev.focus({ preventScroll: true });
+    };
+  }
+
   // ---------- Aviso (toast) ----------
   // Requiere <div class="toast" id="toast" role="status" aria-live="polite"></div>
   let toastTimer;
@@ -232,5 +270,5 @@
     });
   }
 
-  window.EstoicoShared = { ESTOICO_KEY, DIAS_CICLO, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, cycleProgress, ring, CHECK_SVG, icon, toast, pop, countUp, confetti, reduceMotion };
+  window.EstoicoShared = { ESTOICO_KEY, DIAS_CICLO, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, cycleProgress, ring, CHECK_SVG, icon, toast, pop, countUp, confetti, reduceMotion, tabs, dialog };
 })();

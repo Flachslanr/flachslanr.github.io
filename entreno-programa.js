@@ -62,7 +62,7 @@ export const EJ = {
   remo: { n: 'Remo invertido bajo las paralelas', u: 'reps', d: 90, rx: { series: 3, lo: 8, hi: 12, texto: '3 × 8–12' },
     yt: 'inverted row parallel bars', c: 'Cuerpo recto, pecho a la barra, pausa de 1 s arriba.', sube: 'pies sobre el banco, o con chaleco.' },
   facepull: { n: 'Face pulls con banda', u: 'reps', d: 45, rx: { series: 3, lo: 15, hi: 15, texto: '3 × 15' },
-    yt: 'resistance band face pull', c: 'Codos altos, rotá hacia afuera al final. Cuida el hombro para el handstand.', sube: 'usá una banda más dura.' },
+    yt: 'resistance band face pull', c: 'Codos altos, rotá hacia afuera al final. Cuidá el hombro para el handstand.', sube: 'usá una banda más dura.' },
   legraise: { n: 'Elevaciones de piernas colgado', u: 'reps', d: 75, rx: { series: 3, lo: 8, hi: 10, texto: '3 × 8–10' },
     yt: 'hanging leg raise strict tutorial', c: 'Sin balanceo, piernas estiradas hasta 90° o más. Es compresión pura para el press.', sube: 'subí los pies hasta la barra (toes to bar).' },
   lateral: { n: 'Plancha lateral', u: 's', d: 30, rx: { series: 3, lo: 30, hi: 45, texto: '3 × 30–45 s por lado' },

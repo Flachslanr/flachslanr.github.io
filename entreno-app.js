@@ -168,12 +168,16 @@ function abrirHoja(id, i, origen) {
   $('#sh-save').classList.toggle('btn-primary', !e.d);
   $('#sh-clear').hidden = vacio(dv[i]);
   $('#scrim').classList.add('show');
+  $('#sheet').inert = false;
   $('#sheet').classList.add('show');
-  $('#sh-title').focus({ preventScroll: true });
+  // El resto de la página queda inerte mientras la hoja está abierta
+  H.soltar = SH.dialog($('#sheet'), $('#sh-title'));
 }
 function cerrarHoja() {
   $('#scrim').classList.remove('show');
   $('#sheet').classList.remove('show');
+  $('#sheet').inert = true;
+  H.soltar?.(false); H.soltar = null;
   const id = H.id, i = H.i;
   H.id = null;
   document.querySelector(`[data-set="${id}"][data-i="${i}"]`)?.focus({ preventScroll: true });
@@ -314,7 +318,7 @@ function renderPlan() {
 let exGraf = 'domlast', delPend = null;
 
 // Gráfico de línea con el récord marcado y etiquetas directas
-function grafico(pts, { max, meta, unidad = '', etiqueta = 'Evolución' } = {}) {
+function grafico(pts, { max, meta, unidad = '', etiqueta = 'Evolución', vacioTxt = 'Sin registros todavía' } = {}) {
   const W = 320, H = 170, L = 28, R = 12, T0 = 22, B = 22;
   const top = max || Math.max(4, ...pts.map((p) => p.v), meta || 0) * 1.15;
   const x = (i) => (pts.length < 2 ? (L + W - R) / 2 : L + (i * (W - L - R)) / (pts.length - 1));
@@ -323,7 +327,7 @@ function grafico(pts, { max, meta, unidad = '', etiqueta = 'Evolución' } = {}) 
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(etiqueta)}">`;
   ticks.forEach((v) => { s += `<line class="g-grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text class="g-axis" x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`; });
   if (meta) s += `<line class="g-meta" x1="${L}" x2="${W - R}" y1="${y(meta)}" y2="${y(meta)}"/><text class="g-meta-t" x="${L + 4}" y="${y(meta) - 6}" text-anchor="start">META ${meta}</text>`;
-  if (!pts.length) return s + `<text class="g-empty" x="${(L + W - R) / 2}" y="${H / 2}" text-anchor="middle">Sin registros todavía</text></svg>`;
+  if (!pts.length) return s + `<text class="g-empty" x="${(L + W - R) / 2}" y="${H / 2}" text-anchor="middle">${esc(vacioTxt)}</text></svg>`;
   const best = Math.max(...pts.map((p) => p.v)), iPR = pts.findIndex((p) => p.v === best);
   if (pts.length > 1) {
     s += `<path class="g-area" d="M${x(0)},${y(0)} ${pts.map((p, i) => `L${x(i)},${y(p.v)}`).join(' ')} L${x(pts.length - 1)},${y(0)} Z"/>`;
@@ -372,13 +376,13 @@ function renderProgreso() {
     <div class="tile"><p class="eyebrow">L-sit</p><b>${ls ? num(ls) + '<small> s</small>' : '–'}</b><small>mejor marca</small></div>
   </div>
   <div class="section-h"><h2>Test de dominadas</h2><span class="eyebrow">Meta 10</span></div>
-  <div class="card"><div class="chart">${grafico(tests.map((t) => ({ fecha: t.fecha, v: t.reps })), { max: 12, meta: 10, etiqueta: 'Máximo de dominadas estrictas por test. ' + resumenTests(tests) })}</div>
+  <div class="card"><div class="chart">${grafico(tests.map((t) => ({ fecha: t.fecha, v: t.reps })), { max: 12, meta: 10, vacioTxt: 'Cargá tu primer test abajo', etiqueta: 'Máximo de dominadas estrictas por test. ' + resumenTests(tests) })}</div>
     <p class="chart-sum">${resumenTests(tests)}</p>
     <div class="form"><label>Fecha<input class="field" type="date" id="p-fecha" value="${hoyISO()}"></label><label>Reps<input class="field" inputmode="numeric" id="p-reps" style="width:76px"></label><button class="btn" id="p-add" type="button">${SH.icon('plus')}Agregar test</button></div></div>
   <div class="section-h"><h2>Por ejercicio</h2><span>mejor serie de cada sesión</span></div>
   <div class="card">
     <label class="sr-only" for="ex-sel">Ejercicio</label><select id="ex-sel" class="field">${opciones}</select>
-    <div class="chart" style="margin-top:var(--s3)">${grafico(serie, { unidad: uEj.trim(), etiqueta: 'Mejor serie por sesión: ' + EJ[exGraf].n })}</div>
+    <div class="chart" style="margin-top:var(--s3)">${grafico(serie, { unidad: uEj.trim(), vacioTxt: 'Todavía no lo cargaste en una sesión', etiqueta: 'Mejor serie por sesión: ' + EJ[exGraf].n })}</div>
     ${serie.length ? `<p class="chart-sum">Mejor: <b>${num(Math.max(...serie.map((p) => p.v)))}${uEj}</b> · última: ${num(serie[serie.length - 1].v)}${uEj} · ${serie.length} ${serie.length === 1 ? 'sesión' : 'sesiones'}</p>` : ''}</div>
   <div class="section-h"><h2>Escalera al handstand</h2><span class="eyebrow">Paso ${nivel} de ${ESCALERA.length}</span></div>
   <div class="card">
@@ -431,7 +435,7 @@ function renderAjustes() {
     <textarea class="field" id="exp-txt" readonly hidden></textarea></div>
   <div class="section-h"><h2>Estoico</h2></div>
   <div class="card"><p class="dim" style="font-size:14px">${estoico && estoico.cycleStart ? `Conectado. Ciclo de Estoico iniciado el ${fmt(estoico.cycleStart)}. Cada sesión guardada marca "Entrenar" ese día.` : 'Todavía no hay un ciclo de Estoico en este teléfono. Empezá uno en Estoico y cada sesión que guardes va a marcar "Entrenar".'}</p></div>
-  <p class="version">Entreno v1.2 · ${S.sesiones.length} ${S.sesiones.length === 1 ? 'sesión guardada' : 'sesiones guardadas'}</p>`;
+  <p class="version">Entreno v1.3 · ${S.sesiones.length} ${S.sesiones.length === 1 ? 'sesión guardada' : 'sesiones guardadas'}</p>`;
 }
 $('#view-ajustes').addEventListener('click', async (ev) => {
   const id = ev.target.closest('button')?.id;
@@ -463,12 +467,12 @@ $('#view-ajustes').addEventListener('change', async (ev) => {
 });
 
 // ---------- Navegación ----------
+const selectTab = SH.tabs(setView);
 function setView(v) {
   document.querySelectorAll('.view').forEach((el) => (el.hidden = el.id !== 'view-' + v));
-  document.querySelectorAll('.tab[data-view]').forEach((b) => b.setAttribute('aria-selected', b.dataset.view === v));
+  selectTab(v);
   scrollTo({ top: 0 });
 }
-document.querySelector('.tabbar').addEventListener('click', (ev) => { const b = ev.target.closest('[data-view]'); if (b) setView(b.dataset.view); });
 
 function renderAll() { renderHeader(); renderSesion(); renderPlan(); renderProgreso(); renderAjustes(); }
 renderAll();
