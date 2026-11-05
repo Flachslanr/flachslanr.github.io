@@ -63,15 +63,17 @@ main {padding:0 16px;max-width:640px;margin:auto}
 .week-nav {display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px}
 .week-nav button {background:var(--surface-2);border:1px solid var(--line);color:var(--text);padding:8px 12px;border-radius:8px;font-size:12px}
 .week-nav button:hover {background:var(--surface-3)}
+.week-nav button:disabled {opacity:.35;cursor:default}
 .week-nav button.today {background:var(--accent);color:#12141A;font-weight:600;border-color:var(--accent)}
 .week-info {font-size:12px;color:var(--dim);font-family:'JetBrains Mono'}
 
 /* Day Grid */
 .day-grid {display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:18px}
-.day-btn {aspect-ratio:1;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:10px;font:12px 'JetBrains Mono';cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .2s}
+.day-btn {min-height:64px;padding:6px 0;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:10px;font:12px 'JetBrains Mono';cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .2s}
 .day-btn:hover {background:var(--surface-3)}
 .day-btn.active {background:var(--accent);color:#12141A;border-color:var(--accent);font-weight:600}
 .day-btn.today {outline:2px solid var(--accent);outline-offset:-1px}
+.day-name {font:10px 'JetBrains Mono';opacity:.7;margin-bottom:2px}
 .day-number {font:13px 'JetBrains Mono';font-weight:600}
 .day-complete {font:9px 'JetBrains Mono';margin-top:2px;opacity:.7}
 
@@ -334,9 +336,11 @@ a.nav-btn {text-decoration:none}
 </div>
 </div>
 
+<script src="/shared.js"></script>
 <script>
 'use strict';
-const KEY = 'trivium.v2', VERSION = 2;
+const { ESTOICO_KEY: KEY, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek } = window.EstoicoShared;
+const VERSION = 2;
 
 const STOICS = [
   ["No es que nos falte tiempo, sino que perdemos mucho.", "Séneca"],
@@ -359,17 +363,6 @@ const STOICS = [
   ["Quien se conquista a sí mismo es más poderoso que quien conquista ciudades.", "Confucio"],
   ["El que espera es quien trabaja.", "Séneca"],
   ["Actúa de forma que podrías vivir eternamente así.", "Marco Aurelio"]
-];
-
-const HABITS = [
-  {id:'python', category:'mente', name:'Aprender Python', icon:'🐍', weeklyTarget:3, weight:4},
-  {id:'lectura', category:'mente', name:'Leer', icon:'📖', weeklyTarget:3, weight:4},
-  {id:'entrenar', category:'cuerpo', name:'Entrenar', icon:'💪', weeklyTarget:4, weight:5},
-  {id:'agua', category:'cuerpo', name:'Agua +2L', icon:'💧', weeklyTarget:7, weight:5},
-  {id:'alcohol', category:'cuerpo', name:'No alcohol', icon:'🍷', weeklyTarget:7, weight:5},
-  {id:'azucar', category:'cuerpo', name:'No azúcar', icon:'🍬', weeklyTarget:5, weight:5},
-  {id:'meditar', category:'alma', name:'Meditar', icon:'🧘', weeklyTarget:4, weight:3},
-  {id:'ayudar', category:'alma', name:'Ayudar a alguien', icon:'🙏', weeklyTarget:1, weight:3}
 ];
 
 const CATEGORIES = [
@@ -396,33 +389,7 @@ const LEVELS = [
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
-function dateKey(d=new Date()) {
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-}
-
-function parseDate(k) {
-  return new Date(k + 'T12:00:00');
-}
-
-function addDays(d, n) {
-  let x = new Date(d);
-  x.setDate(x.getDate() + n);
-  return x;
-}
-
-function dayOfWeek(k) {
-  return parseDate(k).getDay();
-}
-
-function getMonday(d) {
-  let day = d.getDay() || 7;
-  return addDays(d, 1 - day);
-}
-
-function formatDate(k) {
-  return parseDate(k).toLocaleDateString('es-AR', {weekday:'short', day:'numeric', month:'short'});
-}
-
+// ---------- Estado y guardado ----------
 function defaultState() {
   return {
     schemaVersion: VERSION,
@@ -436,296 +403,278 @@ function defaultState() {
 function load() {
   try {
     let raw = localStorage.getItem(KEY);
-    return raw ? JSON.parse(raw) : defaultState();
+    return raw ? { ...defaultState(), ...JSON.parse(raw) } : defaultState();
   } catch(e) {
     console.warn(e);
+    // No pisamos datos que no se pudieron leer: se guarda una copia aparte.
+    try { localStorage.setItem(KEY + '.bak-' + Date.now(), localStorage.getItem(KEY)); } catch(_) {}
     return defaultState();
   }
 }
 
 let state = load();
+delete state.displayWeek; // ya no se guarda: siempre se abre en la semana actual
 
 function save() {
-  localStorage.setItem(KEY, JSON.stringify(state));
+  try {
+    localStorage.setItem(KEY, JSON.stringify(state));
+    return true;
+  } catch(e) {
+    console.warn(e);
+    toast('No se pudo guardar. Liberá espacio en el teléfono.');
+    return false;
+  }
 }
 
+// ---------- Semanas ----------
+// Semana real del ciclo, sin limitar (puede ser < 1 o > 12)
+function getRawWeek() {
+  return state.cycleStart ? weekNumber(state.cycleStart) : null;
+}
+// Semana actual limitada a 1..12
 function getCurrentWeek() {
-  if (!state.cycleStart) return null;
-  let start = parseDate(state.cycleStart);
-  let today = new Date();
-  let diff = Math.floor((today - start) / (1000*60*60*24));
-  return Math.floor(diff / 7) + 1;
+  let w = getRawWeek();
+  return w === null ? null : Math.max(1, Math.min(12, w));
 }
 
 function getWeekDates(weekNum) {
   if (!state.cycleStart) return null;
-  let start = parseDate(state.cycleStart);
-  let weekStart = addDays(start, (weekNum - 1) * 7);
+  let weekStart = addDays(parseDate(state.cycleStart), (weekNum - 1) * 7);
   let days = [];
-  for (let i = 0; i < 7; i++) {
-    days.push(dateKey(addDays(weekStart, i)));
-  }
+  for (let i = 0; i < 7; i++) days.push(dateKey(addDays(weekStart, i)));
   return days;
 }
 
+// Semana que se está mirando en Registro (solo en memoria)
+let displayWeek = null;
+let selectedDate = null;
 function getDisplayWeek() {
-  if (!state.cycleStart) return 1;
-  let currentWeek = getCurrentWeek();
-  return state.displayWeek || currentWeek;
+  if (displayWeek === null) displayWeek = getCurrentWeek() || 1;
+  return displayWeek;
 }
-
 function setDisplayWeek(w) {
-  state.displayWeek = Math.max(1, Math.min(12, w));
-  save();
+  displayWeek = Math.max(1, Math.min(12, w));
 }
 
-function getWeekData(weekNum) {
+// Lee una semana sin modificar el estado; con create=true la crea para escribir
+function getWeekData(weekNum, create = false) {
   let key = 'week_' + weekNum;
-  if (!state.weeklyData[key]) {
-    state.weeklyData[key] = {
-      habits: {},
-      points: 0,
-      completion: 0
-    };
+  let wd = state.weeklyData[key];
+  if (!wd) {
+    wd = { habits: {}, points: 0, completion: 0 };
+    if (create) state.weeklyData[key] = wd;
   }
-  HABITS.forEach(h => {
-    if (!state.weeklyData[key].habits[h.id]) {
-      state.weeklyData[key].habits[h.id] = [];
-    }
-  });
-  return state.weeklyData[key];
+  if (!wd.habits) wd.habits = {};
+  if (create) HABITS.forEach(h => { if (!wd.habits[h.id]) wd.habits[h.id] = []; });
+  return wd;
 }
 
 function isCompleted(habitId, dateStr) {
   if (!state.cycleStart) return false;
-  let start = parseDate(state.cycleStart);
-  let dayIndex = Math.floor((parseDate(dateStr) - start) / (1000*60*60*24));
-  if (dayIndex < 0 || dayIndex >= 84) return false;
-  
-  let weekNum = Math.floor(dayIndex / 7) + 1;
-  let dayOfWeek = dayIndex % 7;
-  let weekData = getWeekData(weekNum);
-  
-  return weekData.habits[habitId] && weekData.habits[habitId].includes(dayOfWeek);
+  let pos = position(state.cycleStart, dateStr);
+  if (!pos) return false;
+  let days = getWeekData(pos.week).habits[habitId];
+  return !!days && days.includes(pos.dow);
 }
 
-function toggleHabit(habitId, dateStr) {
-  if (!state.cycleStart) return;
-  
-  let today = dateKey();
-  let yesterday = dateKey(addDays(new Date(), -1));
-  
-  if (dateStr !== today && dateStr !== yesterday) {
-    toast('Solo puedes editar hoy y ayer.');
-    return;
+// ---------- Nivel ----------
+// El nivel se deriva de las semanas cerradas: sube con una semana al 100 %
+// y baja con una semana por debajo del 50 %. La semana en curso no cuenta.
+function levelFromHistory() {
+  let raw = getRawWeek();
+  if (raw === null) return 1;
+  let closed = Math.min(12, raw - 1);
+  let lvl = 1;
+  for (let w = 1; w <= closed; w++) {
+    let c = computeWeek(getWeekData(w).habits).completion;
+    if (c >= 100) lvl = Math.min(12, lvl + 1);
+    else if (c < 50) lvl = Math.max(1, lvl - 1);
   }
-  
-  let start = parseDate(state.cycleStart);
-  let dayIndex = Math.floor((parseDate(dateStr) - start) / (1000*60*60*24));
-  if (dayIndex < 0 || dayIndex >= 84) return;
-  
-  let weekNum = Math.floor(dayIndex / 7) + 1;
-  let dayOfWeek = dayIndex % 7;
-  let weekData = getWeekData(weekNum);
-  
-  let idx = weekData.habits[habitId].indexOf(dayOfWeek);
-  if (idx >= 0) {
-    weekData.habits[habitId].splice(idx, 1);
-  } else {
-    weekData.habits[habitId].push(dayOfWeek);
-  }
-  
-  recalculateWeek(weekNum);
-  save();
-  renderDayDetail(dateStr);
-  renderHeader();
+  return lvl;
 }
 
-function recalculateWeek(weekNum) {
-  let weekData = getWeekData(weekNum);
-  let totalCompletion = 0;
-  let totalPoints = 0;
-  
-  HABITS.forEach(h => {
-    let completed = weekData.habits[h.id].length;
-    let isComplete = completed >= h.weeklyTarget;
-    if (isComplete) {
-      totalPoints += h.weight;
-    }
-    totalCompletion += Math.min(100, Math.round(completed / h.weeklyTarget * 100)) / HABITS.length;
-  });
-  
-  weekData.completion = Math.round(totalCompletion);
-  weekData.points = totalPoints;
-  
-  // Update level based on weekly performance
-  let previousWeek = getWeekData(Math.max(1, weekNum - 1));
-  let newLevel = state.currentLevel;
-  
-  if (weekData.completion >= 100) {
-    newLevel = Math.min(12, state.currentLevel + 1);
-  } else if (weekData.completion < 50) {
-    newLevel = Math.max(1, state.currentLevel - 1);
+function settleLevel() {
+  let lvl = levelFromHistory();
+  if (lvl !== state.currentLevel) {
+    state.currentLevel = lvl;
+    save();
   }
-  
-  state.currentLevel = newLevel;
 }
 
+// ---------- Registro de hábitos ----------
 function canEditDate(dateStr) {
   let today = dateKey();
   let yesterday = dateKey(addDays(new Date(), -1));
   return dateStr === today || dateStr === yesterday;
 }
 
+function toggleHabit(habitId, dateStr) {
+  if (!state.cycleStart) return;
+  if (!canEditDate(dateStr)) {
+    toast('Solo podés editar hoy y ayer.');
+    return;
+  }
+  let pos = position(state.cycleStart, dateStr);
+  if (!pos) return;
+
+  let weekData = getWeekData(pos.week, true);
+  let days = weekData.habits[habitId];
+  let idx = days.indexOf(pos.dow);
+  if (idx >= 0) days.splice(idx, 1);
+  else days.push(pos.dow);
+
+  recalculateWeek(pos.week);
+  settleLevel();
+  save();
+  renderDayGrid();
+  renderDayDetail(dateStr);
+  renderHeader();
+}
+
+function recalculateWeek(weekNum) {
+  let weekData = getWeekData(weekNum, true);
+  let r = computeWeek(weekData.habits);
+  weekData.completion = r.completion;
+  weekData.points = r.points;
+}
+
 function toast(msg) {
   let t = $('#toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 1500);
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove('show'), 1800);
 }
 
+// ---------- Render ----------
 function renderHeader() {
   if (!state.cycleStart) return;
-  
-  let levelData = LEVELS[state.currentLevel - 1];
   $('#level-display').textContent = state.currentLevel;
-  
-  let currentWeek = getCurrentWeek() || 1;
-  $('#cycle-progress').textContent = `Semana ${currentWeek} de 12`;
-  $('#cycle-fill').style.width = (currentWeek / 12 * 100) + '%';
+
+  let raw = getRawWeek();
+  let label;
+  if (raw < 1) label = 'Empieza el ' + parseDate(state.cycleStart).toLocaleDateString('es-AR', {day:'numeric', month:'short'});
+  else if (raw > 12) label = 'Ciclo completado';
+  else label = `Semana ${raw} de 12`;
+  $('#cycle-progress').textContent = label;
+  $('#cycle-fill').style.width = (Math.max(0, Math.min(12, raw)) / 12 * 100) + '%';
 }
 
 function switchView(v) {
+  if (!['registro', 'progreso', 'motivacion'].includes(v)) v = 'registro';
   state.currentView = v;
   save();
   $$('.view').forEach(x => x.classList.toggle('active', x.id === 'view-' + v));
-  $$('.nav-btn').forEach(x => x.classList.toggle('active', x.dataset.view === v));
-  
+  $$('.nav-btn[data-view]').forEach(x => x.classList.toggle('active', x.dataset.view === v));
+
+  if (v === 'registro') renderRegistro();
   if (v === 'progreso') renderProgreso();
   if (v === 'motivacion') renderMotivacion();
 }
 
 function renderRegistro() {
   if (!state.cycleStart) return;
-  
-  let displayWeek = getDisplayWeek();
-  let weekDates = getWeekDates(displayWeek);
-  if (!weekDates) return;
-  
+
+  let week = getDisplayWeek();
+  let weekDates = getWeekDates(week);
   let today = dateKey();
-  let currentWeek = getCurrentWeek() || 1;
-  
-  // Update nav buttons
-  $('#prev-week').onclick = () => {
-    setDisplayWeek(getDisplayWeek() - 1);
-    renderRegistro();
-  };
-  $('#next-week').onclick = () => {
-    setDisplayWeek(getDisplayWeek() + 1);
-    renderRegistro();
-  };
-  $('#prev-week').disabled = displayWeek <= 1;
-  $('#next-week').disabled = displayWeek >= 12;
-  
-  let firstDay = parseDate(weekDates[0]);
-  let lastDay = parseDate(weekDates[6]);
-  $('#week-info').textContent = `Sem ${displayWeek} · ${firstDay.toLocaleDateString('es-AR', {day:'numeric',month:'short'})} – ${lastDay.toLocaleDateString('es-AR', {day:'numeric',month:'short'})}`;
-  
-  // Day grid
-  let gridHtml = '';
-  weekDates.forEach((d, idx) => {
-    let dayName = ['L','M','X','J','V','S','D'][idx];
-    let dayNum = parseDate(d).getDate();
-    let isToday = d === today;
-    let canEdit = canEditDate(d);
+
+  $('#prev-week').onclick = () => { setDisplayWeek(getDisplayWeek() - 1); selectedDate = null; renderRegistro(); };
+  $('#next-week').onclick = () => { setDisplayWeek(getDisplayWeek() + 1); selectedDate = null; renderRegistro(); };
+  $('#prev-week').disabled = week <= 1;
+  $('#next-week').disabled = week >= 12;
+
+  let fmt = d => parseDate(d).toLocaleDateString('es-AR', {day:'numeric', month:'short'});
+  $('#week-info').textContent = `Sem ${week} · ${fmt(weekDates[0])} – ${fmt(weekDates[6])}`;
+
+  // Día seleccionado: hoy si está en esta semana; si no, el primero
+  if (!selectedDate || !weekDates.includes(selectedDate)) {
+    selectedDate = weekDates.includes(today) ? today : weekDates[0];
+  }
+
+  renderDayGrid();
+  renderDayDetail(selectedDate);
+}
+
+function renderDayGrid() {
+  let weekDates = getWeekDates(getDisplayWeek());
+  let today = dateKey();
+  $('#day-grid').innerHTML = weekDates.map(d => {
+    let date = parseDate(d);
+    let dayName = date.toLocaleDateString('es-AR', {weekday:'narrow'}).toUpperCase();
     let completion = Math.round(HABITS.filter(h => isCompleted(h.id, d)).length / HABITS.length * 100);
-    
-    gridHtml += `<button class="day-btn ${isToday?'today':''} ${d === displayWeek === currentWeek && idx === new Date().getDay() - 1 ? 'active' : ''}" data-date="${d}">
-      <span class="day-number">${dayNum}</span>
+    let cls = [d === today ? 'today' : '', d === selectedDate ? 'active' : ''].join(' ');
+    return `<button class="day-btn ${cls}" data-date="${d}" aria-pressed="${d === selectedDate}" aria-label="${date.toLocaleDateString('es-AR', {weekday:'long', day:'numeric'})}, ${completion}%">
+      <span class="day-name">${dayName}</span>
+      <span class="day-number">${date.getDate()}</span>
       <span class="day-complete">${completion}%</span>
     </button>`;
-  });
-  $('#day-grid').innerHTML = gridHtml;
-  
+  }).join('');
+
   $$('.day-btn').forEach(btn => {
     btn.onclick = () => {
-      $$('.day-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderDayDetail(btn.dataset.date);
+      selectedDate = btn.dataset.date;
+      renderDayGrid();
+      renderDayDetail(selectedDate);
     };
   });
-  
-  // Default to today if in current week
-  if (displayWeek === currentWeek) {
-    let todayBtn = $$(`.day-btn[data-date="${today}"]`)[0];
-    if (todayBtn) {
-      todayBtn.click();
-    } else {
-      let firstBtn = $('.day-btn');
-      if (firstBtn) firstBtn.click();
-    }
-  } else {
-    let firstBtn = $('.day-btn');
-    if (firstBtn) firstBtn.click();
-  }
 }
 
 function renderDayDetail(dateStr) {
   if (!state.cycleStart) return;
-  
+
+  let today = dateKey();
+  let yesterday = dateKey(addDays(new Date(), -1));
+  let editable = canEditDate(dateStr);
+
   let dayDetail = `<div class="day-detail-card">
     <div class="day-detail-header">${parseDate(dateStr).toLocaleDateString('es-AR', {weekday:'long', day:'numeric', month:'long'})}</div>`;
-  
-  if (!canEditDate(dateStr)) {
-    let yesterday = dateKey(addDays(new Date(), -1));
-    if (dateStr === yesterday) {
-      dayDetail += `<div class="edit-notice">⚠️ Editando día anterior. Solo puedes cambiar el registro de hoy y ayer.</div>`;
-    } else {
-      dayDetail += `<div class="edit-notice">📌 Día pasado. No se puede editar (solo hoy y ayer).</div>`;
-    }
+
+  if (dateStr === yesterday) {
+    dayDetail += `<div class="edit-notice">Estás editando ayer. Podés cambiar el registro de hoy y de ayer.</div>`;
+  } else if (!editable) {
+    dayDetail += dayDiff(today, dateStr) > 0
+      ? `<div class="edit-notice">Día futuro. Vas a poder registrarlo cuando llegue.</div>`
+      : `<div class="edit-notice">Día pasado. Solo se pueden editar hoy y ayer.</div>`;
   }
-  
+
   let completed = HABITS.filter(h => isCompleted(h.id, dateStr)).length;
   dayDetail += `<div class="day-detail-info">${completed} de ${HABITS.length} completados</div>`;
-  
   dayDetail += '</div>';
   $('#day-detail-slot').innerHTML = dayDetail;
-  
-  // Render habits by category
+
   let habitsHtml = '';
   CATEGORIES.forEach(cat => {
     let catHabits = HABITS.filter(h => h.category === cat.id);
-    let habitsForDay = catHabits.filter(h => isCompleted(h.id, dateStr));
-    
-    let editable = canEditDate(dateStr);
-    
+    let doneCount = catHabits.filter(h => isCompleted(h.id, dateStr)).length;
+
     habitsHtml += `<div class="habit-section">
       <div class="category-header" style="--cat:${cat.color}">
         <span class="category-bar" style="background:${cat.color}"></span>
         <span class="category-title">${cat.label}</span>
-        <span class="category-label">${habitsForDay.length}/${catHabits.length}</span>
+        <span class="category-label">${doneCount}/${catHabits.length}</span>
       </div>
       <div class="habit-list">`;
-    
+
     catHabits.forEach(h => {
       let done = isCompleted(h.id, dateStr);
       habitsHtml += `<div class="habit-row">
-        <span class="habit-icon">${h.icon}</span>
+        <span class="habit-icon" aria-hidden="true">${h.icon}</span>
         <div class="habit-info">
           <div class="habit-name">${h.name}</div>
           <div class="habit-meta">Objetivo: ${h.weeklyTarget}x/semana · Peso: ${h.weight}</div>
         </div>
-        <button class="habit-check ${done?'done':''} ${!editable?'editing-disabled':''}" data-habit="${h.id}" data-date="${dateStr}" ${!editable?'disabled':''}>
+        <button class="habit-check ${done?'done':''} ${!editable?'editing-disabled':''}" data-habit="${h.id}" data-date="${dateStr}" aria-label="${h.name}" aria-pressed="${done}" ${!editable?'disabled':''}>
           ${done ? '✓' : ''}
         </button>
       </div>`;
     });
-    
+
     habitsHtml += `</div></div>`;
   });
-  
+
   $('#habit-list-slot').innerHTML = habitsHtml;
-  
+
   $$('[data-habit]').forEach(btn => {
     btn.onclick = (e) => {
       e.stopPropagation();
@@ -736,68 +685,47 @@ function renderDayDetail(dateStr) {
 
 function renderProgreso() {
   if (!state.cycleStart) return;
-  
+
   let startDate = parseDate(state.cycleStart);
-  let endDate = addDays(startDate, 84);
-  
-  $('#cycle-dates').textContent = startDate.toLocaleDateString('es-AR', {day:'numeric', month:'short', year:'numeric'}) + ' – ' + 
-    endDate.toLocaleDateString('es-AR', {day:'numeric', month:'short', year:'numeric'});
-  
-  // Level display with estoico name
+  let endDate = addDays(startDate, 83);
+  let fmt = d => d.toLocaleDateString('es-AR', {day:'numeric', month:'short', year:'numeric'});
+  $('#cycle-dates').textContent = fmt(startDate) + ' – ' + fmt(endDate);
+
   let levelData = LEVELS[state.currentLevel - 1];
   $('#final-level').textContent = levelData.name;
-  
-  let currentWeek = getCurrentWeek() || 1;
-  let currentWeekData = getWeekData(currentWeek);
+
   let totalXP = 0;
   let completedWeeks = 0;
-  
-  for (let w = 1; w <= 12; w++) {
-    let weekData = getWeekData(w);
-    totalXP += weekData.points || 0;
-    if ((weekData.completion || 0) >= 100) completedWeeks++;
-  }
-  
-  let levelProgress = (state.currentLevel - 1) / 11;
-  $('#final-level-bar').style.width = (levelProgress * 100) + '%';
-  $('#level-info').textContent = `${levelData.name} — Nivel ${state.currentLevel} de 12 · ${totalXP} puntos acumulados`;
-  
-  // Week progress
   let weeksList = '';
   for (let w = 1; w <= 12; w++) {
-    let weekData = getWeekData(w);
-    let completion = weekData.completion || 0;
-    let status = completion >= 100 ? '✓ Completa' : completion < 50 ? '⚠ Baja' : '• Parcial';
-    let statusColor = completion >= 100 ? 'var(--success)' : completion < 50 ? 'var(--danger)' : 'var(--dim)';
-    
+    let r = computeWeek(getWeekData(w).habits);
+    totalXP += r.points;
+    if (r.completion >= 100) completedWeeks++;
+    let color = r.completion >= 100 ? 'var(--success)' : r.completion < 50 ? 'var(--danger)' : 'var(--dim)';
     weeksList += `<div class="week-row">
       <span class="week-num">Sem ${w}</span>
       <div class="week-bar">
-        <div class="week-bar-fill" style="width:${completion}%;background:${statusColor}"></div>
+        <div class="week-bar-fill" style="width:${r.completion}%;background:${color}"></div>
       </div>
-      <span class="week-status">${completion}%</span>
+      <span class="week-status">${r.completion}%</span>
     </div>`;
   }
   $('#week-progress-list').innerHTML = weeksList;
-  
-  // Summary stats
+
+  $('#final-level-bar').style.width = ((state.currentLevel - 1) / 11 * 100) + '%';
+  $('#level-info').textContent = `${levelData.name} — Nivel ${state.currentLevel} de 12 · ${totalXP} puntos acumulados`;
+
   $('#stat-completed').textContent = completedWeeks;
   $('#stat-xp').textContent = totalXP;
-  
-  // Update header
+
   renderHeader();
-  
-  // Check if cycle is complete
-  if (currentWeek > 12) {
-    showCycleEnd();
-  }
 }
 
 function renderMotivacion() {
   let idx = dateKey().split('').reduce((a,c) => a + c.charCodeAt(0), 0) % STOICS.length;
   $('#quote-text').textContent = '"' + STOICS[idx][0] + '"';
   $('#quote-author').textContent = '— ' + STOICS[idx][1];
-  
+
   $('#new-quote').onclick = () => {
     let randomIdx = Math.floor(Math.random() * STOICS.length);
     $('#quote-text').textContent = '"' + STOICS[randomIdx][0] + '"';
@@ -805,67 +733,98 @@ function renderMotivacion() {
   };
 }
 
+// ---------- Inicio y fin de ciclo ----------
 function showInitModal() {
-  let today = dateKey();
-  $('#start-date').value = today;
+  $('#start-date').value = dateKey();
   $('#init-modal').classList.remove('hidden');
-  
+
   $('#start-cycle').onclick = () => {
     let dateStr = $('#start-date').value;
     if (!dateStr) {
-      toast('Selecciona una fecha.');
+      toast('Elegí una fecha.');
       return;
     }
     state.cycleStart = dateStr;
     state.currentLevel = 1;
     state.weeklyData = {};
-    state.displayWeek = 1;
+    state.cycleEndShown = false;
+    displayWeek = null;
+    selectedDate = null;
     save();
     $('#init-modal').classList.add('hidden');
     render();
   };
 }
 
+function cycleTotals() {
+  let points = 0;
+  for (let w = 1; w <= 12; w++) points += computeWeek(getWeekData(w).habits).points;
+  return { points, final: computeWeek(getWeekData(12).habits).completion };
+}
+
 function showCycleEnd() {
-  let endData = getWeekData(12);
   let levelData = LEVELS[state.currentLevel - 1];
-  $('#cycle-end-result').textContent = 'Has alcanzado: ' + levelData.name;
+  let t = cycleTotals();
+  $('#cycle-end-result').textContent = 'Alcanzaste: ' + levelData.name;
   $('#cycle-end-stats').innerHTML = `
-    <div>Completaste <strong>${endData.completion}%</strong> de la semana final.</div>
-    <div style="margin-top:8px">Puntos totales en el ciclo: <strong>${Array.from({length:12}, (_,i) => getWeekData(i+1).points || 0).reduce((a,b) => a+b, 0)}</strong></div>
+    <div>Completaste <strong>${t.final}%</strong> de la semana final.</div>
+    <div style="margin-top:8px">Puntos totales en el ciclo: <strong>${t.points}</strong></div>
     <div style="margin-top:8px">Nivel alcanzado: <strong>${state.currentLevel} de 12</strong></div>
   `;
-  
+
   $('#cycle-end-modal').classList.add('show');
-  
+  state.cycleEndShown = true;
+  save();
+
   $('#new-cycle').onclick = () => {
+    if (!confirm('¿Empezar un ciclo nuevo? El ciclo actual se guarda en el historial y el registro vuelve a cero.')) return;
+    let archive = (state.archive || []).concat([{
+      cycleStart: state.cycleStart,
+      endedAt: dateKey(),
+      level: state.currentLevel,
+      points: t.points,
+      weeklyData: state.weeklyData
+    }]);
     $('#cycle-end-modal').classList.remove('show');
     state = defaultState();
+    state.archive = archive;
+    displayWeek = null;
+    selectedDate = null;
     save();
     showInitModal();
   };
-  
+
   $('#view-summary').onclick = () => {
-    switchView('progreso');
     $('#cycle-end-modal').classList.remove('show');
+    switchView('progreso');
   };
 }
 
 function render() {
   if (!state.cycleStart) {
     showInitModal();
-  } else {
-    $('#init-modal').classList.add('hidden');
-    renderHeader();
-    renderRegistro();
-    if (state.currentView === 'progreso') renderProgreso();
-    if (state.currentView === 'motivacion') renderMotivacion();
+    return;
   }
+  $('#init-modal').classList.add('hidden');
+  settleLevel();
+  renderHeader();
+  switchView(state.currentView);
+  if (getRawWeek() > 12 && !state.cycleEndShown) showCycleEnd();
 }
 
-// Navigation
+// Navegación
 $$('.nav-btn[data-view]').forEach(btn => {
   btn.onclick = () => switchView(btn.dataset.view);
+});
+
+// Si la app queda abierta y cambia el día, refrescar al volver
+let lastDay = dateKey();
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden || !state.cycleStart || dateKey() === lastDay) return;
+  lastDay = dateKey();
+  displayWeek = null;
+  selectedDate = null;
+  render();
 });
 
 render();

@@ -1,10 +1,11 @@
 // Service worker del sitio (Estoico + Entreno): hace que ambas abran sin conexión.
 // Estrategia "red primero": con internet siempre trae la última versión publicada;
 // sin internet usa la copia guardada. Subí la versión si cambiás la lista de archivos.
-const CACHE_NAME = 'estoico-v3';
+const CACHE_NAME = 'estoico-v4';
 const APP_SHELL = [
   '/',
   '/index.html',
+  '/shared.js',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
