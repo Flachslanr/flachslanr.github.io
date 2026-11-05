@@ -95,7 +95,8 @@ button{cursor:pointer;touch-action:manipulation;background:none;border:0;padding
 
 /* Barra de progreso */
 .progress{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
-.progress > i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width 600ms var(--ease)}
+.progress > i{display:block;height:100%;background:var(--accent);border-radius:3px;transform-origin:left;transition:width 600ms var(--ease);animation:grow 700ms 100ms var(--ease) both}
+@keyframes grow{from{transform:scaleX(0)}}
 
 /* ---------- Botones ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);min-height:44px;padding:0 18px;border-radius:var(--r-pill);
@@ -125,6 +126,22 @@ button{cursor:pointer;touch-action:manipulation;background:none;border:0;padding
 .check:active:not(:disabled){transform:scale(.9)}
 .check:disabled{opacity:.4;cursor:not-allowed}
 
+/* ---------- Micro-interacciones ---------- */
+/* Pop al completar: el check rebota, el trazo se dibuja y sale un halo */
+.check{position:relative}
+.check.pop{animation:pop 420ms var(--ease-pop)}
+.check.pop svg{animation:draw 320ms 60ms var(--ease) both}
+.check.pop::after,.pop-halo::after{content:"";position:absolute;inset:-1px;border-radius:inherit;border:2px solid var(--accent);pointer-events:none;animation:halo 520ms var(--ease) forwards}
+.pop-halo{position:relative}
+@keyframes pop{0%{transform:scale(.82)}55%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes draw{from{stroke-dashoffset:24}to{stroke-dashoffset:0}}
+@keyframes halo{from{opacity:.8;transform:scale(1)}to{opacity:0;transform:scale(1.45)}}
+/* Rebote corto para números que cambian */
+.bump{display:inline-block;animation:bump 380ms var(--ease-pop)}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.2)}100%{transform:scale(1)}}
+/* Confetti (canvas creado por shared.js) */
+.confetti{position:fixed;inset:0;z-index:70;pointer-events:none;width:100%;height:100%}
+
 /* Interruptor estilo iOS */
 .toggle{appearance:none;-webkit-appearance:none;position:relative;flex:none;width:51px;height:31px;margin:0;border-radius:var(--r-pill);background:var(--surface-3);border:1px solid var(--line);cursor:pointer;transition:background var(--dur) var(--ease)}
 .toggle::before{content:"";position:absolute;top:2px;left:2px;width:25px;height:25px;border-radius:50%;background:var(--text);box-shadow:0 2px 6px #0006;transition:transform var(--dur) var(--ease)}
@@ -142,19 +159,23 @@ textarea.field{min-height:84px;resize:vertical}
 .tab{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--faint);font-size:12px;font-weight:500;text-decoration:none;transition:color var(--dur-fast)}
 .tab .icon{width:24px;height:24px}
 .tab[aria-selected="true"]{color:var(--accent)}
-.tab[aria-selected="true"]::before{content:"";position:absolute;top:0;left:50%;width:28px;height:3px;margin-left:-14px;border-radius:0 0 3px 3px;background:var(--accent)}
+.tab[aria-selected="true"]::before{content:"";position:absolute;top:0;left:50%;width:28px;height:3px;margin-left:-14px;border-radius:0 0 3px 3px;background:var(--accent);animation:tab-bar var(--dur) var(--ease)}
+.tab[aria-selected="true"] .icon{animation:tab-ico 360ms var(--ease-pop)}
+.tab:active .icon{transform:scale(.88)}
+@keyframes tab-bar{from{transform:scaleX(0)}}
+@keyframes tab-ico{0%{transform:scale(.85)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
 
 /* Cambio de vista */
-.view{animation:view-in var(--dur) var(--ease)}
-@keyframes view-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.view{animation:view-in 260ms var(--ease)}
+@keyframes view-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 /* ---------- Hoja inferior ---------- */
 .scrim{position:fixed;inset:0;z-index:40;background:#000a;opacity:0;pointer-events:none;transition:opacity var(--dur) var(--ease)}
 .scrim.show{opacity:1;pointer-events:auto}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-width:var(--wrap);margin:0 auto;background:var(--surface);border:1px solid var(--line);border-bottom:0;border-radius:28px 28px 0 0;
   padding:10px calc(var(--s5) + env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + var(--s5)) calc(var(--s5) + env(safe-area-inset-left));
-  transform:translateY(105%);visibility:hidden;transition:transform 320ms var(--ease),visibility 0s 320ms}
-.sheet.show{transform:none;visibility:visible;transition:transform 320ms var(--ease)}
+  transform:translateY(105%);visibility:hidden;transition:transform 240ms cubic-bezier(.4,0,1,1),visibility 0s 240ms}
+.sheet.show{transform:none;visibility:visible;transition:transform 300ms var(--ease)}
 .grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto var(--s4)}
 
 /* ---------- Aviso (toast) ---------- */

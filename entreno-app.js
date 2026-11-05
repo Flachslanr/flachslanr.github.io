@@ -112,10 +112,12 @@ $('#view-sesion').addEventListener('click', (ev) => {
   if (st) { abrirHoja(st.dataset.set, Number(st.dataset.i), st); return; }
   const ok = ev.target.closest('[data-ok]');
   if (ok) {
-    const id = ok.dataset.ok, b = borrador();
-    b[id] = [b[id]?.[0] ? '' : 1];
+    const id = ok.dataset.ok, b = borrador(), hecho = !b[id]?.[0];
+    b[id] = [hecho ? 1 : ''];
     guardar(); refrescarTarjeta(id);
-    document.querySelector(`[data-ok="${id}"]`)?.focus({ preventScroll: true });
+    const nb = document.querySelector(`[data-ok="${id}"]`);
+    nb?.focus({ preventScroll: true });
+    if (hecho) SH.pop(nb);
     return;
   }
   const r = ev.target.closest('[data-rest]');
@@ -185,12 +187,26 @@ function guardarSerie(conDescanso) {
   const v = leerValor();
   if (v === null) { err('Ingresá un número válido'); return; }
   const { id, i } = H, b = borrador();
+  // Récord: supera la mejor marca guardada y todo lo cargado hoy en ese ejercicio
+  const hoy = (b[id] || []).filter((x) => !vacio(x)).map((x) => Number(String(x).replace(',', '.')));
+  const mejor = mejorDe(id), record = mejor > 0 && v > Math.max(mejor, ...hoy);
   (b[id] = b[id] || [])[i] = String(v);
   guardar(); refrescarTarjeta(id); cerrarHoja();
+  const btn = document.querySelector(`[data-set="${id}"][data-i="${i}"]`);
+  SH.pop(btn);
+  if (record) {
+    SH.confetti(btn);
+    toast(`Récord nuevo en ${EJ[id].n}: ${num(v)} ${UNIDAD[EJ[id].u] || EJ[id].u}`, 3600, 'trend');
+  }
   if (conDescanso && EJ[id].d) timer(EJ[id].d, `${EJ[id].n} · serie ${i + 1}`);
 }
-$('#sh-minus').onclick = () => { const v = leerValor() ?? 0; $('#sh-val').value = num(Math.max(0, v - pasoDe(H.id))); };
-$('#sh-plus').onclick = () => { const v = leerValor() ?? 0; $('#sh-val').value = num(v + pasoDe(H.id)); };
+function paso(dir) {
+  const v = leerValor() ?? 0;
+  $('#sh-val').value = num(Math.max(0, v + dir * pasoDe(H.id)));
+  SH.pop($('#sh-val'), 'bump');
+}
+$('#sh-minus').onclick = () => paso(-1);
+$('#sh-plus').onclick = () => paso(1);
 $('#sh-save').onclick = () => guardarSerie(false);
 $('#sh-save-rest').onclick = () => guardarSerie(true);
 $('#sh-clear').onclick = () => {
@@ -386,8 +402,13 @@ $('#view-progreso').addEventListener('click', (ev) => {
   if (ev.target.closest('#p-add')) {
     const f = $('#p-fecha').value, r = Number(($('#p-reps').value || '').trim());
     if (!f || !r) { err('Completá la fecha y las reps'); return; }
-    S.pruebas = S.pruebas.filter((p) => p.fecha !== f).concat([{ fecha: f, reps: r }]);
-    guardar(); toast('Test guardado'); renderProgreso();
+    const otros = S.pruebas.filter((p) => p.fecha !== f), mejor = Math.max(0, ...otros.map((p) => p.reps));
+    S.pruebas = otros.concat([{ fecha: f, reps: r }]);
+    guardar(); renderProgreso();
+    if (mejor > 0 && r > mejor) {
+      SH.confetti($('#view-progreso .chart'));
+      toast(r >= 10 ? `¡${r} dominadas! Llegaste a la meta` : `Récord nuevo en el test: ${r} dominadas`, 3600, 'trend');
+    } else toast('Test guardado');
   }
 });
 
@@ -410,7 +431,7 @@ function renderAjustes() {
     <textarea class="field" id="exp-txt" readonly hidden></textarea></div>
   <div class="section-h"><h2>Estoico</h2></div>
   <div class="card"><p class="dim" style="font-size:14px">${estoico && estoico.cycleStart ? `Conectado. Ciclo de Estoico iniciado el ${fmt(estoico.cycleStart)}. Cada sesión guardada marca "Entrenar" ese día.` : 'Todavía no hay un ciclo de Estoico en este teléfono. Empezá uno en Estoico y cada sesión que guardes va a marcar "Entrenar".'}</p></div>
-  <p class="version">Entreno v1.1 · ${S.sesiones.length} ${S.sesiones.length === 1 ? 'sesión guardada' : 'sesiones guardadas'}</p>`;
+  <p class="version">Entreno v1.2 · ${S.sesiones.length} ${S.sesiones.length === 1 ? 'sesión guardada' : 'sesiones guardadas'}</p>`;
 }
 $('#view-ajustes').addEventListener('click', async (ev) => {
   const id = ev.target.closest('button')?.id;

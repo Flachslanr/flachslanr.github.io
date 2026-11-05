@@ -147,7 +147,7 @@
 <script src="/shared.js"></script>
 <script>
 'use strict';
-const { ESTOICO_KEY: KEY, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, cycleProgress, ring, CHECK_SVG, icon, toast } = window.EstoicoShared;
+const { ESTOICO_KEY: KEY, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, cycleProgress, ring, CHECK_SVG, icon, toast, pop, countUp, confetti } = window.EstoicoShared;
 const VERSION = 2;
 
 const STOICS = [
@@ -256,6 +256,7 @@ function getWeekDates(weekNum) {
 // Semana que se está mirando en Registro (solo en memoria)
 let displayWeek = null;
 let selectedDate = null;
+let streakShown = false; // evita animar la racha en la primera carga
 function getDisplayWeek() {
   if (displayWeek === null) displayWeek = getCurrentWeek() || 1;
   return displayWeek;
@@ -326,8 +327,10 @@ function toggleHabit(habitId, dateStr) {
   if (!pos) return;
 
   let weekData = getWeekData(pos.week, true);
+  let before = computeWeek(weekData.habits).completion;
   let days = weekData.habits[habitId];
   let idx = days.indexOf(pos.dow);
+  let nowDone = idx < 0;
   if (idx >= 0) days.splice(idx, 1);
   else days.push(pos.dow);
 
@@ -340,6 +343,15 @@ function toggleHabit(habitId, dateStr) {
   // Mantener el foco en el mismo check después de redibujar
   let btn = document.querySelector(`.check[data-habit="${habitId}"]`);
   if (btn) btn.focus({ preventScroll: true });
+  if (nowDone) {
+    pop(btn);
+    pop($('#day-count b'), 'bump');
+  }
+  // Semana al 100%: el único momento de Estoico con confetti
+  if (nowDone && before < 100 && weekData.completion >= 100) {
+    confetti();
+    toast(`Semana ${pos.week} al 100%. Bien ahí.`, 3200, 'flame');
+  }
 }
 
 function recalculateWeek(weekNum) {
@@ -420,16 +432,24 @@ function renderRegistro() {
 function renderDayGrid() {
   let weekDates = getWeekDates(getDisplayWeek());
   let today = dateKey();
-  $('#day-grid').innerHTML = weekDates.map(d => {
+  let grid = $('#day-grid');
+  // Ancho anterior de cada barra, para que crezca desde ahí en lugar de saltar
+  let prev = {};
+  grid.querySelectorAll('.day').forEach(b => { prev[b.dataset.date] = b.querySelector('.bar i').dataset.p; });
+  let pcts = {};
+  grid.innerHTML = weekDates.map(d => {
     let date = parseDate(d);
-    let pct = Math.round(dayRatio(d) * 100);
+    let pct = pcts[d] = Math.round(dayRatio(d) * 100);
+    let from = prev[d] ?? pct;
     let cls = ['day', d === today ? 'today' : '', dayDiff(today, d) > 0 ? 'future' : ''].join(' ');
     return `<button class="${cls}" type="button" data-date="${d}" aria-pressed="${d === selectedDate}" aria-label="${shortDate(date, { weekday: 'long', day: 'numeric' })}${d === today ? ', hoy' : ''}, ${pct}%">
       <span class="l" aria-hidden="true">${narrowDay(date)}</span>
       <span class="n" aria-hidden="true">${date.getDate()}</span>
-      <span class="bar" aria-hidden="true"><i style="width:${pct}%"></i></span>
+      <span class="bar" aria-hidden="true"><i data-p="${pct}" style="width:${from}%"></i></span>
     </button>`;
   }).join('');
+  void grid.offsetWidth;
+  grid.querySelectorAll('.day').forEach(b => { b.querySelector('.bar i').style.width = pcts[b.dataset.date] + '%'; });
 }
 
 function renderDayDetail(dateStr) {
@@ -446,9 +466,16 @@ function renderDayDetail(dateStr) {
   let completed = HABITS.filter(h => isCompleted(h.id, dateStr)).length;
   $('#day-count').innerHTML = `<b>${completed}</b> de ${HABITS.length} hábitos`;
 
-  let n = streak();
-  $('#streak').hidden = n < 2;
-  $('#streak span').textContent = `Racha de ${n} días`;
+  // Racha: el número cuenta hasta el valor nuevo y la píldora rebota si crece
+  let n = streak(), pill = $('#streak'), was = pill.hidden ? 0 : Number(pill.dataset.n || 0);
+  pill.hidden = n < 2;
+  pill.dataset.n = n;
+  if (n >= 2) {
+    countUp($('#streak span'), n, v => `Racha de ${v} días`);
+    if (was && n > was) pop(pill, 'bump');
+    else if (!was && streakShown) pop(pill, 'bump');
+  }
+  streakShown = true;
 
   let notice = '';
   if (dateStr === yesterday) notice = 'Estás editando ayer. Podés cambiar el registro de hoy y de ayer.';

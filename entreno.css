@@ -55,6 +55,11 @@ details.warm ul{margin:0 0 var(--s4);padding-left:18px;color:var(--dim);font-siz
 .set.done{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .set.next{border:1.5px solid var(--accent);color:var(--text)}
 .set:active{transform:scale(.96)}
+/* Pop al cargar una serie (keyframes en shared.css) */
+.set{position:relative}
+.set.pop{animation:pop 420ms var(--ease-pop)}
+.set.pop::after{content:"";position:absolute;inset:-1px;border-radius:inherit;border:2px solid var(--accent);pointer-events:none;animation:halo-sm 520ms var(--ease) forwards}
+@keyframes halo-sm{from{opacity:.8;transform:scale(1)}to{opacity:0;transform:scale(1.12,1.25)}}
 .ok-row{display:flex;align-items:center;gap:var(--s3);font-weight:600;font-size:14px}
 .ex-foot{display:flex;gap:var(--s2)}
 .ex-foot .pill{flex:1;justify-content:center}
@@ -76,6 +81,7 @@ details.warm ul{margin:0 0 var(--s4);padding-left:18px;color:var(--dim);font-siz
 .rest-ring .fg{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset 250ms linear}
 .rest-ring text{font:500 15px var(--mono);fill:var(--text)}
 .rest.done{border-color:var(--accent)}
+.rest.done .rest-ring{animation:pop 520ms var(--ease-pop)}
 .rest.done .rest-ring .fg{stroke-dashoffset:0;transition:stroke-dashoffset 500ms var(--ease)}
 .rest-t{flex:1;min-width:0}
 .rest-t b{display:block;font-weight:600;font-size:15px}

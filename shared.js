@@ -121,6 +121,81 @@
   // Check que se dibuja (el trazo se anima con CSS)
   const CHECK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
 
+  // ---------- Micro-interacciones ----------
+  const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Reinicia una animación CSS basada en una clase (pop, bump, pop-halo)
+  function pop(el, cls = 'pop') {
+    if (!el) return;
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+    const off = (ev) => { if (ev.target === el) { el.classList.remove(cls); el.removeEventListener('animationend', off); } };
+    el.addEventListener('animationend', off);
+  }
+
+  // Número que cuenta hasta el valor nuevo. Recuerda el último valor en data-n.
+  function countUp(el, to, fmt = String, ms = 500) {
+    if (!el) return;
+    const from = el.dataset.n === undefined ? to : Number(el.dataset.n);
+    el.dataset.n = to;
+    cancelAnimationFrame(el._raf);
+    if (from === to || reduceMotion()) { el.textContent = fmt(to); return; }
+    const t0 = performance.now();
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = fmt(Math.round(from + (to - from) * e));
+      if (k < 1) el._raf = requestAnimationFrame(step);
+    };
+    el._raf = requestAnimationFrame(step);
+  }
+
+  // Confetti breve (≈1,6 s) desde un elemento o desde arriba al centro.
+  // Solo para logros: semana al 100% y récords. No corre con movimiento reducido.
+  function confetti(origin) {
+    if (reduceMotion()) return;
+    const c = document.createElement('canvas');
+    c.className = 'confetti';
+    c.setAttribute('aria-hidden', 'true');
+    const W = innerWidth, H = innerHeight, dpr = Math.min(2, devicePixelRatio || 1);
+    c.width = W * dpr; c.height = H * dpr;
+    document.body.appendChild(c);
+    const ctx = c.getContext('2d');
+    ctx.scale(dpr, dpr);
+    const cs = getComputedStyle(document.body);
+    const cols = ['--accent', '--sand', '--vital', '--mente', '--alma', '--text'].map((v) => cs.getPropertyValue(v).trim()).filter(Boolean);
+    let ox = W / 2, oy = H * 0.3;
+    if (origin) { const r = origin.getBoundingClientRect(); ox = r.left + r.width / 2; oy = r.top + r.height / 2; }
+    const P = Array.from({ length: 70 }, (_, i) => {
+      const a = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 0.85, s = 7 + Math.random() * 8;
+      return { x: ox, y: oy, vx: Math.cos(a) * s, vy: Math.sin(a) * s, w: 5 + Math.random() * 4, h: 9 + Math.random() * 5,
+        r: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.35, c: cols[i % cols.length] };
+    });
+    const DUR = 1600, t0 = performance.now();
+    let last = t0;
+    const frame = (t) => {
+      const k = (t - t0) / DUR, dt = Math.min(3, (t - last) / 16.67); // normalizado a 60 fps
+      last = t;
+      ctx.clearRect(0, 0, W, H);
+      if (k >= 1) { c.remove(); return; }
+      ctx.globalAlpha = k < 0.65 ? 1 : 1 - (k - 0.65) / 0.35;
+      P.forEach((p) => {
+        p.vy += 0.32 * dt;
+        const drag = Math.pow(0.975, dt);
+        p.vx *= drag; p.vy *= drag;
+        p.x += p.vx * dt; p.y += p.vy * dt; p.r += p.vr * dt;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.r);
+        ctx.fillStyle = p.c;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.r * 1.7)) + 1);
+        ctx.restore();
+      });
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }
+
   // ---------- Aviso (toast) ----------
   // Requiere <div class="toast" id="toast" role="status" aria-live="polite"></div>
   let toastTimer;
@@ -157,5 +232,5 @@
     });
   }
 
-  window.EstoicoShared = { ESTOICO_KEY, DIAS_CICLO, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, cycleProgress, ring, CHECK_SVG, icon, toast };
+  window.EstoicoShared = { ESTOICO_KEY, DIAS_CICLO, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, cycleProgress, ring, CHECK_SVG, icon, toast, pop, countUp, confetti, reduceMotion };
 })();
