@@ -87,7 +87,12 @@
     left: '<path d="m15 18-6-6 6-6"/>',
     right: '<path d="m9 18 6-6-6-6"/>',
     back: '<path d="m12 19-7-7 7-7M19 12H5"/>',
-    refresh: '<path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/>'
+    refresh: '<path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/>',
+    play: '<path d="M6 4l14 8-14 8z"/>',
+    timer: '<circle cx="12" cy="14" r="8"/><path d="M10 2h4M12 14l3-3"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    minus: '<path d="M5 12h14"/>',
+    column: '<path d="M3 4h18M5 7h14M6 20h12M3 22h18M7.5 7v13M10.5 7v13M13.5 7v13M16.5 7v13"/>'
   };
 
   // Sprite con todos los íconos, insertado una vez al principio del <body>
@@ -99,6 +104,22 @@
   function icon(name, cls = '') {
     return `<svg class="icon ${cls}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
   }
+
+  // Fracción del ciclo de 84 días ya recorrida (0 a 1)
+  function cycleProgress(cycleStart, today = dateKey()) {
+    return Math.max(0, Math.min(1, (dayDiff(cycleStart, today) + 1) / DIAS_CICLO));
+  }
+
+  // Anillo de progreso del encabezado (p de 0 a 1)
+  function ring(p, text, label) {
+    const C = 138.23, off = (C * (1 - Math.max(0, Math.min(1, p)))).toFixed(1);
+    return `<svg class="ring" viewBox="0 0 52 52" role="img" aria-label="${label}"><circle class="bgc" cx="26" cy="26" r="22"/>` +
+      `<circle class="fg" cx="26" cy="26" r="22" stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 26 26)"/>` +
+      `<text x="26" y="30" text-anchor="middle" aria-hidden="true">${text}</text></svg>`;
+  }
+
+  // Check que se dibuja (el trazo se anima con CSS)
+  const CHECK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
 
   // ---------- Aviso (toast) ----------
   // Requiere <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -136,5 +157,5 @@
     });
   }
 
-  window.EstoicoShared = { ESTOICO_KEY, DIAS_CICLO, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, icon, toast };
+  window.EstoicoShared = { ESTOICO_KEY, DIAS_CICLO, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, cycleProgress, ring, CHECK_SVG, icon, toast };
 })();

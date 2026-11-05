@@ -22,41 +22,65 @@
 <body data-app="entreno">
 
 <header class="top">
-  <div class="top-inner">
-    <div class="top-row">
+  <div class="wrap top-row">
+    <div class="top-txt">
       <p class="eyebrow" id="h-eyebrow">Calistenia · 12 semanas</p>
-      <a class="back" href="/">← Estoico</a>
+      <h1 class="brand">Entreno</h1>
     </div>
-    <h1 class="brand">Entreno</h1>
-    <div class="cycle"><span id="h-semana">Semana 1 de 12</span><span id="h-fase"></span></div>
-    <div class="bar"><i id="h-bar" style="width:8%"></i></div>
+    <a class="pill" href="/"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Estoico</a>
+    <div id="h-ring"></div>
   </div>
 </header>
 
-<main>
-  <section class="view" id="view-sesion"></section>
-  <section class="view" id="view-plan" hidden></section>
-  <section class="view" id="view-progreso" hidden></section>
-  <section class="view" id="view-ajustes" hidden></section>
+<main class="wrap">
+  <section class="view" id="view-sesion" aria-label="Sesión"></section>
+  <section class="view" id="view-plan" aria-label="Plan" hidden></section>
+  <section class="view" id="view-progreso" aria-label="Progreso" hidden></section>
+  <section class="view" id="view-ajustes" aria-label="Ajustes" hidden></section>
 </main>
 
-<div class="timer" id="timer" hidden>
-  <div class="tt" id="t-time">0:00</div>
-  <div class="lbl" id="t-lbl">Descanso</div>
+<!-- Descanso: anillo que se vacía -->
+<div class="rest" id="timer" role="timer" aria-label="Descanso">
+  <svg class="rest-ring" viewBox="0 0 64 64" aria-hidden="true">
+    <circle class="bgc" cx="32" cy="32" r="27"/>
+    <circle class="fg" id="t-ring" cx="32" cy="32" r="27" stroke-dasharray="169.65" stroke-dashoffset="0" transform="rotate(-90 32 32)"/>
+    <text id="t-time" x="32" y="37" text-anchor="middle">0:00</text>
+  </svg>
+  <div class="rest-t"><b id="t-title" aria-live="polite">Descanso</b><span id="t-lbl"></span></div>
   <button class="btn" id="t-plus" type="button">+15 s</button>
-  <button class="btn" id="t-stop" type="button">Listo</button>
+  <button class="btn btn-primary" id="t-stop" type="button">Listo</button>
 </div>
 
-<nav class="nav" aria-label="Secciones">
-  <div class="nav-inner" role="tablist">
-    <button role="tab" data-view="sesion" aria-selected="true">
-      <svg class="icon" aria-hidden="true"><use href="#i-flame"/></svg><span>Sesión</span></button>
-    <button role="tab" data-view="plan" aria-selected="false">
-      <svg class="icon" aria-hidden="true"><use href="#i-list"/></svg><span>Plan</span></button>
-    <button role="tab" data-view="progreso" aria-selected="false">
-      <svg class="icon" aria-hidden="true"><use href="#i-trend"/></svg><span>Progreso</span></button>
-    <button role="tab" data-view="ajustes" aria-selected="false">
-      <svg class="icon" aria-hidden="true"><use href="#i-sliders"/></svg><span>Ajustes</span></button>
+<!-- Hoja para cargar una serie -->
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title">
+  <div class="grab" aria-hidden="true"></div>
+  <p class="eyebrow" id="sh-ex">Ejercicio</p>
+  <h2 class="sheet-title" id="sh-title" tabindex="-1">Serie 1</h2>
+  <p class="sheet-prev" id="sh-prev"></p>
+  <div class="stepper">
+    <button class="stepper-btn" id="sh-minus" type="button" aria-label="Restar"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg></button>
+    <div class="stepper-val">
+      <input id="sh-val" inputmode="decimal" autocomplete="off" aria-describedby="sh-unit">
+      <label id="sh-unit" for="sh-val">reps</label>
+    </div>
+    <button class="stepper-btn" id="sh-plus" type="button" aria-label="Sumar"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button>
+  </div>
+  <div class="sheet-actions">
+    <button class="btn btn-primary btn-lg btn-block" id="sh-save-rest" type="button">Guardar e iniciar descanso</button>
+    <div class="sheet-row">
+      <button class="btn btn-block" id="sh-save" type="button">Guardar</button>
+      <button class="btn btn-ghost btn-danger" id="sh-clear" type="button">Borrar</button>
+    </div>
+  </div>
+</div>
+
+<nav class="tabbar" aria-label="Secciones">
+  <div class="tabbar-inner" role="tablist">
+    <button class="tab" role="tab" type="button" data-view="sesion" aria-selected="true"><svg class="icon" aria-hidden="true"><use href="#i-flame"/></svg><span>Sesión</span></button>
+    <button class="tab" role="tab" type="button" data-view="plan" aria-selected="false"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg><span>Plan</span></button>
+    <button class="tab" role="tab" type="button" data-view="progreso" aria-selected="false"><svg class="icon" aria-hidden="true"><use href="#i-trend"/></svg><span>Progreso</span></button>
+    <button class="tab" role="tab" type="button" data-view="ajustes" aria-selected="false"><svg class="icon" aria-hidden="true"><use href="#i-sliders"/></svg><span>Ajustes</span></button>
   </div>
 </nav>
 
