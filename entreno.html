@@ -12,10 +12,11 @@
 <meta name="description" content="Programa de calistenia de 4 días con registro de series.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/shared.css">
 <link rel="stylesheet" href="/entreno.css">
 </head>
-<body>
+<body data-app="entreno">
 
 <header class="top">
   <div class="top-inner">
@@ -46,26 +47,19 @@
 <nav class="nav" aria-label="Secciones">
   <div class="nav-inner" role="tablist">
     <button role="tab" data-view="sesion" aria-selected="true">
-      <svg viewBox="0 0 24 24"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg><span>Sesión</span></button>
+      <svg class="icon" aria-hidden="true"><use href="#i-flame"/></svg><span>Sesión</span></button>
     <button role="tab" data-view="plan" aria-selected="false">
-      <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span>Plan</span></button>
+      <svg class="icon" aria-hidden="true"><use href="#i-list"/></svg><span>Plan</span></button>
     <button role="tab" data-view="progreso" aria-selected="false">
-      <svg viewBox="0 0 24 24"><path d="M4 19h16M6 15l4-4 3 3 5-6"/></svg><span>Progreso</span></button>
+      <svg class="icon" aria-hidden="true"><use href="#i-trend"/></svg><span>Progreso</span></button>
     <button role="tab" data-view="ajustes" aria-selected="false">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg><span>Ajustes</span></button>
+      <svg class="icon" aria-hidden="true"><use href="#i-sliders"/></svg><span>Ajustes</span></button>
   </div>
 </nav>
 
-<div class="toast" id="toast" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="/shared.js"></script>
 <script type="module" src="/entreno-app.js"></script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch((e) => console.warn(e));
-  });
-}
-</script>
 </body>
 </html>

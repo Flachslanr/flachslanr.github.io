@@ -1,0 +1,68 @@
+/* =====================================================================
+   BASE DE DISEÑO COMPARTIDA — Estoico + Entreno
+   Tokens únicos de color, tipografía, espaciado y movimiento.
+   Cada app define su acento: arena en Estoico, verde vital en Entreno.
+   ===================================================================== */
+:root{
+  color-scheme:dark;
+
+  /* Superficies */
+  --bg:#12141A; --surface:#1A1D25; --surface-2:#20232D; --surface-3:#262A35;
+  --line:#2A2E38; --line-soft:#22252F;
+
+  /* Texto (contraste ≥ 4.5:1 sobre --surface) */
+  --text:#EDEAE3; --dim:#A9ADB7; --faint:#8A8E99;
+
+  /* Marca y estados */
+  --sand:#E8C9A0; --vital:#22C55E; --on-accent:#12141A;
+  --accent:var(--sand);
+  --success:#93AE86; --warn:#D9B36C; --danger:#E0846F;
+
+  /* Categorías de Estoico */
+  --mente:#8AA9C9; --cuerpo:#93AE86; --alma:#C9A66B;
+
+  /* Tipografía */
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'Inter',-apple-system,system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --fs-xs:12px; --fs-sm:13px; --fs-md:15px; --fs-lg:17px;
+
+  /* Espaciado (ritmo de 4/8) y radios */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
+  --r-sm:10px; --r:14px; --r-lg:24px; --r-pill:999px;
+
+  /* Movimiento */
+  --dur-fast:150ms; --dur:250ms;
+  --ease:cubic-bezier(.2,.8,.2,1); --ease-pop:cubic-bezier(.34,1.56,.64,1);
+
+  /* Elevación */
+  --shadow:0 12px 40px #0008;
+}
+body[data-app="entreno"]{ --accent:var(--vital); }
+
+/* ---------- Base ---------- */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+::selection{background:var(--accent);color:var(--on-accent)}
+
+/* ---------- Utilidades ---------- */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.icon{width:22px;height:22px;flex:none;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+
+/* ---------- Aviso (toast) ---------- */
+.toast{position:fixed;z-index:60;left:50%;top:calc(env(safe-area-inset-top) + 12px);transform:translate(-50%,-160%);
+  max-width:min(90vw,420px);display:flex;align-items:center;gap:var(--s2);
+  background:var(--surface-3);border:1px solid var(--line);border-radius:var(--r-pill);
+  padding:10px 18px;font-size:var(--fs-sm);font-weight:500;color:var(--text);box-shadow:var(--shadow);
+  pointer-events:none;transition:transform 300ms var(--ease)}
+.toast.show{transform:translate(-50%,0)}
+.toast .icon{width:18px;height:18px;color:var(--accent)}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}

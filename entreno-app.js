@@ -19,10 +19,8 @@ function proxima() {
   if (!u) return SECUENCIA[0];
   return SECUENCIA[(SECUENCIA.indexOf(u.dia) + 1) % SECUENCIA.length];
 }
-function toast(t, ms = 2400) {
-  const el = $('#toast'); el.textContent = t; el.hidden = false;
-  clearTimeout(toast._t); toast._t = setTimeout(() => (el.hidden = true), ms);
-}
+const toast = (t, ms, ic) => SH.toast(t, ms, ic);
+const err = (t) => SH.toast(t, 3200, null);
 
 // ---------- Encabezado ----------
 function renderHeader() {
@@ -44,7 +42,7 @@ function sugerencia(id, w) {
   if (v.some((x) => x < r.lo)) return { tipo: 'mantener', txt: `Mantené: buscá llegar a ${r.lo} en todas las series.` };
   return { tipo: 'seguir', txt: `Seguí: sumá reps hasta ${r.hi} en todas las series.` };
 }
-const TIP = { sube: ['var(--ok)', 'Subí'], mantener: ['var(--warn)', 'Mantené'], seguir: ['var(--accent)', 'Seguí'], ok: ['var(--ok)', 'Bien'] };
+const TIP = { sube: ['var(--ok)', 'Subí'], mantener: ['var(--warn)', 'Mantené'], seguir: ['var(--mente)', 'Seguí'], ok: ['var(--ok)', 'Bien'] };
 
 // ---------- Vista: sesión ----------
 let diaSel = null;
@@ -122,10 +120,10 @@ function guardarHoy() {
     if (v !== null) algo = true;
     (valores[inp.dataset.ex] = valores[inp.dataset.ex] || [])[Number(inp.dataset.i)] = v;
   });
-  if (!algo) { toast('Cargá al menos una serie antes de guardar'); return; }
+  if (!algo) { err('Cargá al menos una serie antes de guardar'); return; }
   const fecha = hoyISO();
   const ok = guardarSesion({ id: fecha + '_' + diaSel, fecha, ts: Date.now(), dia: diaSel, semana: semanaActual(), valores, nota: $('#nota').value.trim() });
-  if (!ok) { toast('No se pudo guardar. Liberá espacio en el teléfono y probá de nuevo.'); return; }
+  if (!ok) { err('No se pudo guardar. Liberá espacio en el teléfono y probá de nuevo.'); return; }
   const est = marcarEnEstoico(fecha);
   const msg = { marcado: 'Sesión guardada · "Entrenar" marcado en Estoico', 'ya-marcado': 'Sesión guardada · Estoico ya tenía hoy marcado' }[est] || 'Sesión guardada';
   toast(msg, 3200);
@@ -162,7 +160,7 @@ async function toggleWake(on) {
   try {
     if (on) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; }); }
     else { await wakeLock?.release(); wakeLock = null; }
-  } catch (e) { toast('Este teléfono no permite mantener la pantalla encendida desde la app'); const c = $('#wake'); if (c) c.checked = false; }
+  } catch (e) { err('Este teléfono no permite mantener la pantalla encendida desde la app'); const c = $('#wake'); if (c) c.checked = false; }
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden && $('#wake')?.checked && !wakeLock) toggleWake(true); });
 
@@ -193,25 +191,25 @@ function renderPlan() {
 
 // ---------- Vista: progreso ----------
 let exGraf = 'domlast', delPend = null;
-function grafico(pts, { max, meta, unidad } = {}) {
+function grafico(pts, { max, meta, unidad, etiqueta = 'Evolución' } = {}) {
   const W = 320, H = 160, L = 26, R = 10, T0 = 16, B = 24;
   const top = max || Math.max(4, ...pts.map((p) => p.v), meta || 0) * 1.15;
   const x = (i) => (pts.length < 2 ? (L + W - R) / 2 : L + (i * (W - L - R)) / (pts.length - 1));
   const y = (v) => T0 + (H - T0 - B) * (1 - v / top);
   const ticks = [0, top / 2, top].map((v) => Math.round(v));
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Evolución">`;
-  ticks.forEach((v) => { s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#2A2E38"/><text x="${L - 6}" y="${y(v) + 3}" font-size="9" text-anchor="end" fill="#747985" font-family="JetBrains Mono,monospace">${v}</text>`; });
-  if (meta) s += `<line x1="${L}" x2="${W - R}" y1="${y(meta)}" y2="${y(meta)}" stroke="#93AE86" stroke-dasharray="4 4" stroke-width="1.5"/><text x="${W - R}" y="${y(meta) - 5}" font-size="10" text-anchor="end" fill="#93AE86">objetivo ${meta}</text>`;
-  if (!pts.length) return s + `<text x="${W / 2}" y="${H / 2}" font-size="12" text-anchor="middle" fill="#747985">Sin registros todavía</text></svg>`;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(etiqueta)}">`;
+  ticks.forEach((v) => { s += `<line class="g-grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text class="g-axis" x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`; });
+  if (meta) s += `<line class="g-meta" x1="${L}" x2="${W - R}" y1="${y(meta)}" y2="${y(meta)}"/><text class="g-meta-t" x="${W - R}" y="${y(meta) - 5}" text-anchor="end">objetivo ${meta}</text>`;
+  if (!pts.length) return s + `<text class="g-empty" x="${W / 2}" y="${H / 2}" text-anchor="middle">Sin registros todavía</text></svg>`;
   if (pts.length > 1) {
-    s += `<path d="M${x(0)},${y(0)} ${pts.map((p, i) => `L${x(i)},${y(p.v)}`).join(' ')} L${x(pts.length - 1)},${y(0)} Z" fill="#E8C9A0" opacity=".08"/>`;
-    s += `<polyline fill="none" stroke="#E8C9A0" stroke-width="2" points="${pts.map((p, i) => x(i) + ',' + y(p.v)).join(' ')}"/>`;
+    s += `<path class="g-area" d="M${x(0)},${y(0)} ${pts.map((p, i) => `L${x(i)},${y(p.v)}`).join(' ')} L${x(pts.length - 1)},${y(0)} Z"/>`;
+    s += `<polyline class="g-line" points="${pts.map((p, i) => x(i) + ',' + y(p.v)).join(' ')}"/>`;
   }
   pts.forEach((p, i) => {
     const last = i === pts.length - 1;
-    s += `<circle cx="${x(i)}" cy="${y(p.v)}" r="${last ? 4.5 : 3}" fill="#E8C9A0"/>`;
-    if (last || pts.length <= 8) s += `<text x="${x(i)}" y="${y(p.v) - 8}" font-size="10" text-anchor="middle" fill="#EDEAE3">${p.v}${unidad || ''}</text>`;
-    if (i === 0 || last || pts.length <= 6) s += `<text x="${x(i)}" y="${H - 6}" font-size="9" text-anchor="middle" fill="#747985" font-family="JetBrains Mono,monospace">${fmt(p.fecha)}</text>`;
+    s += `<circle class="g-pt" cx="${x(i)}" cy="${y(p.v)}" r="${last ? 4.5 : 3}"/>`;
+    if (last || pts.length <= 8) s += `<text class="g-lbl" x="${x(i)}" y="${y(p.v) - 8}" text-anchor="middle">${p.v}${unidad || ''}</text>`;
+    if (i === 0 || last || pts.length <= 6) s += `<text class="g-axis" x="${last && pts.length > 1 ? W - R : x(i)}" y="${H - 6}" text-anchor="${last && pts.length > 1 ? 'end' : 'middle'}">${fmt(p.fecha)}</text>`;
   });
   return s + '</svg>';
 }
@@ -227,15 +225,15 @@ function renderProgreso() {
     <div class="stat"><div class="v">${mejorDe('hs') || '–'}<small> s</small></div><div class="l">Mejor handstand</div></div>
     <div class="stat"><div class="v">${mejorDe('lsit') || '–'}<small> s</small></div><div class="l">Mejor L-sit</div></div>
   </div>
-  <div class="card"><p class="label">Máximo de dominadas estrictas</p><div class="chart">${grafico(tests.map((t) => ({ fecha: t.fecha, v: t.reps })), { max: 12, meta: 10 })}</div>
+  <div class="card"><p class="label">Máximo de dominadas estrictas</p><div class="chart">${grafico(tests.map((t) => ({ fecha: t.fecha, v: t.reps })), { max: 12, meta: 10, etiqueta: 'Máximo de dominadas estrictas por test' })}</div>
     <div class="form" style="margin-top:10px"><label>Fecha<input type="date" id="p-fecha" value="${hoyISO()}"></label><label>Reps<input inputmode="numeric" id="p-reps" style="width:70px"></label><button class="btn" id="p-add" type="button">Agregar test</button></div>
     <p class="faint" style="font-size:12px;margin-top:8px">Testeá en las semanas 6 y 12, al inicio de Pull A.</p></div>
   <div class="card"><p class="label">Evolución por ejercicio</p>
     <div class="form"><label style="flex:1">Ejercicio<select id="ex-sel" class="field">${opciones}</select></label></div>
-    <div class="chart" style="margin-top:8px">${grafico(serieDe(exGraf), { unidad: EJ[exGraf].u === 's' ? 's' : '' })}</div>
+    <div class="chart" style="margin-top:8px">${grafico(serieDe(exGraf), { unidad: EJ[exGraf].u === 's' ? 's' : '', etiqueta: 'Mejor serie por sesión: ' + EJ[exGraf].n })}</div>
     <p class="faint" style="font-size:12px">Mejor serie de cada sesión.</p></div>
   <div class="block"><div class="block-t"><h3>Escalera L-sit → handstand</h3><span>Tocá en qué escalón estás</span></div>
-    <ol class="ladder">${ESCALERA.map((l, i) => { const n = i + 1, cls = n < nivel ? 'done' : n === nivel ? 'cur' : ''; return `<li><button class="${cls}" data-nivel="${n}" aria-current="${n === nivel ? 'step' : 'false'}"><span class="n">${n < nivel ? '✓' : n}</span><span><span class="t">${esc(l.t)}</span><span class="cr">${esc(l.cr)}</span></span></button></li>`; }).join('')}</ol></div>
+    <ol class="ladder">${ESCALERA.map((l, i) => { const n = i + 1, cls = n < nivel ? 'done' : n === nivel ? 'cur' : ''; return `<li><button class="${cls}" data-nivel="${n}" aria-current="${n === nivel ? 'step' : 'false'}"><span class="n">${n < nivel ? SH.icon('check') : n}</span><span><span class="t">${esc(l.t)}</span><span class="cr">${esc(l.cr)}</span></span></button></li>`; }).join('')}</ol></div>
   <div class="block"><div class="block-t"><h3>Historial</h3><span>${S.sesiones.length} sesiones</span></div>
     ${hist.length ? `<ul class="hist">${hist.map((s) => { const D = DIAS[s.dia] || { nombre: s.dia, color: 'var(--faint)' }; return `<li style="--c:${D.color}"><span><b>${fmt(s.fecha)}</b> · ${esc(D.nombre)} · sem ${s.semana}${s.nota ? `<span class="note">${esc(s.nota)}</span>` : ''}</span><button class="btn ghost ${delPend === s.id ? 'danger' : ''}" data-del="${esc(s.id)}" type="button">${delPend === s.id ? '¿Borrar?' : 'Borrar'}</button></li>`; }).join('')}</ul>` : '<p class="faint">Cuando guardes tu primera sesión aparece acá.</p>'}</div>`;
 }
@@ -252,7 +250,7 @@ $('#view-progreso').addEventListener('click', (ev) => {
   }
   if (ev.target.id === 'p-add') {
     const f = $('#p-fecha').value, r = Number(($('#p-reps').value || '').trim());
-    if (!f || !r) { toast('Completá la fecha y las reps'); return; }
+    if (!f || !r) { err('Completá la fecha y las reps'); return; }
     S.pruebas = S.pruebas.filter((p) => p.fecha !== f).concat([{ fecha: f, reps: r }]);
     guardar(); toast('Test guardado'); renderProgreso();
   }
@@ -275,7 +273,7 @@ function renderAjustes() {
     <textarea id="exp-txt" readonly hidden></textarea></div>
   <div class="card" style="display:grid;gap:6px"><p class="label">Estoico</p>
     <p class="dim" style="font-size:13px">${estoico && estoico.cycleStart ? `Conectado. Ciclo de Estoico iniciado el ${fmt(estoico.cycleStart)}. Cada sesión guardada marca "Entrenar" ese día.` : 'Todavía no hay un ciclo de Estoico en este teléfono. Empezá uno en Estoico y cada sesión que guardes va a marcar "Entrenar".'}</p></div>
-  <p class="faint" style="font-size:11px;text-align:center;font-family:var(--mono)">Entreno v1.0 · ${S.sesiones.length} sesiones guardadas</p>`;
+  <p class="faint" style="font-size:12px;text-align:center;font-family:var(--mono)">Entreno v1.0 · ${S.sesiones.length} sesiones guardadas</p>`;
 }
 $('#view-ajustes').addEventListener('click', async (ev) => {
   const id = ev.target.id;
@@ -302,7 +300,7 @@ $('#view-ajustes').addEventListener('change', async (ev) => {
     const d = leerCopia(await ev.target.files[0].text());
     const ok = confirm(`La copia tiene ${d.sesiones.length} sesiones. Va a reemplazar ${S.sesiones.length === 1 ? 'la sesión' : 'las ' + S.sesiones.length + ' sesiones'} que tenés ahora en este teléfono. ¿Seguir?`);
     if (ok) { const n = aplicarCopia(d); toast(`Copia importada · ${n} sesiones`); renderAll(); }
-  } catch (e) { toast(e.message || 'No se pudo leer el archivo'); }
+  } catch (e) { err(e.message || 'No se pudo leer el archivo'); }
   ev.target.value = '';
 });
 

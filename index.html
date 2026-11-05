@@ -27,154 +27,9 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#12141A;--surface:#1A1D25;--surface-2:#20232D;--surface-3:#252934;--line:#2A2E38;--text:#EDEAE3;--dim:#A4A8B2;--faint:#747985;--mente:#8AA9C9;--cuerpo:#93AE86;--alma:#C9A66B;--danger:#D49484;--success:#93AE86;--accent:#E8C9A0;--r:14px}
-* {box-sizing:border-box}
-html, body {margin:0;padding:0}
-body {background:var(--bg);color:var(--text);font-family:Inter,sans-serif;min-height:100vh;padding-bottom:100px;-webkit-font-smoothing:antialiased}
-button, input, select, textarea {font:inherit}
-button {-webkit-tap-highlight-color:transparent;cursor:pointer}
-button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {outline:2px solid var(--accent);outline-offset:2px}
-::selection {background:var(--mente);color:#12141A}
-
-.top {padding:20px;position:sticky;top:0;background:linear-gradient(var(--bg) 86%,transparent);z-index:10}
-.eyebrow {font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 8px}
-.brand {font-family:Fraunces,serif;font-size:27px;font-weight:500;margin:0 0 16px}
-.header-row {display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
-.level-display {font-family:Fraunces;font-size:24px;font-weight:500}
-.level-label {font-family:'JetBrains Mono';font-size:10px;color:var(--faint);text-transform:uppercase;margin-top:4px}
-.progress-bar {height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin:10px 0 8px}
-.progress-fill {height:100%;background:var(--accent);border-radius:6px;transition:width .3s ease}
-.progress-label {font-size:11px;color:var(--dim);font-family:'JetBrains Mono';display:flex;justify-content:space-between}
-
-main {padding:0 16px;max-width:640px;margin:auto}
-.view {display:none}
-.view.active {display:block}
-.greeting {margin:0 0 18px}
-.greeting h2 {font:500 24px Fraunces;margin:0 0 4px}
-.greeting p {margin:0;color:var(--dim);font-size:13px}
-
-.card {background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px}
-.section-label {font:10px 'JetBrains Mono';letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 10px}
-.card-title {font:18px Fraunces;margin-bottom:10px}
-
-/* Week Navigation */
-.week-nav {display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px}
-.week-nav button {background:var(--surface-2);border:1px solid var(--line);color:var(--text);padding:8px 12px;border-radius:8px;font-size:12px}
-.week-nav button:hover {background:var(--surface-3)}
-.week-nav button:disabled {opacity:.35;cursor:default}
-.week-nav button.today {background:var(--accent);color:#12141A;font-weight:600;border-color:var(--accent)}
-.week-info {font-size:12px;color:var(--dim);font-family:'JetBrains Mono'}
-
-/* Day Grid */
-.day-grid {display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:18px}
-.day-btn {min-height:64px;padding:6px 0;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:10px;font:12px 'JetBrains Mono';cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .2s}
-.day-btn:hover {background:var(--surface-3)}
-.day-btn.active {background:var(--accent);color:#12141A;border-color:var(--accent);font-weight:600}
-.day-btn.today {outline:2px solid var(--accent);outline-offset:-1px}
-.day-name {font:10px 'JetBrains Mono';opacity:.7;margin-bottom:2px}
-.day-number {font:13px 'JetBrains Mono';font-weight:600}
-.day-complete {font:9px 'JetBrains Mono';margin-top:2px;opacity:.7}
-
-/* Habit List */
-.habit-section {margin-bottom:20px}
-.category-header {display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:0 4px}
-.category-bar {width:3px;height:20px;border-radius:2px}
-.category-title {font:italic 500 16px Fraunces}
-.category-label {font:10px 'JetBrains Mono';color:var(--faint);margin-left:auto;text-transform:uppercase}
-.habit-list {background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
-.habit-row {display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--line);transition:background .2s}
-.habit-row:last-child {border-bottom:0}
-.habit-row:hover {background:var(--surface-2)}
-.habit-icon {font-size:24px;flex-shrink:0}
-.habit-info {flex:1;min-width:0}
-.habit-name {font:14px Inter;font-weight:500;margin-bottom:3px}
-.habit-meta {font:10px 'JetBrains Mono';color:var(--faint);display:flex;gap:8px;flex-wrap:wrap}
-.habit-check {width:32px;height:32px;border:2px solid var(--line);background:var(--surface-2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .2s;flex-shrink:0}
-.habit-check:hover {background:var(--surface-3)}
-.habit-check.done {background:var(--success);border-color:var(--success);color:#12141A;font-weight:600}
-.habit-check.editing-disabled {opacity:.5;cursor:not-allowed}
-
-/* Day Detail Modal */
-.day-detail-card {background:var(--surface-3);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px}
-.day-detail-header {font:16px Fraunces;margin-bottom:14px;color:var(--text)}
-.day-detail-info {font:11px 'JetBrains Mono';color:var(--faint);margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
-.edit-notice {background:var(--surface-2);border-left:2px solid var(--accent);padding:10px;border-radius:6px;font-size:12px;color:var(--dim);margin-bottom:12px}
-
-/* Week Summary */
-.week-summary {background:var(--surface-2);border-radius:var(--r);padding:14px;margin-bottom:14px}
-.week-stats {display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat {text-align:center;padding:8px}
-.stat-value {font:20px Fraunces;font-weight:600;color:var(--accent)}
-.stat-label {font:10px 'JetBrains Mono';color:var(--faint);margin-top:4px;text-transform:uppercase}
-
-/* Progress View */
-.cycle-header {background:linear-gradient(135deg, var(--mente), var(--alma));border-radius:var(--r);padding:20px;margin-bottom:14px;color:#12141A}
-.cycle-title {font:22px Fraunces;margin:0 0 8px}
-.cycle-dates {font:11px 'JetBrains Mono';opacity:.8;margin:0}
-.level-card {background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px;text-align:center}
-.current-level {font:32px Fraunces;font-weight:600;margin-bottom:8px}
-.level-bar-container {margin:16px 0}
-.level-xp {font:11px 'JetBrains Mono';color:var(--dim);margin-top:8px}
-.week-row {display:flex;align-items:center;gap:8px;padding:12px;background:var(--surface-2);border-radius:8px;margin-bottom:8px}
-.week-num {font:12px 'JetBrains Mono';font-weight:600;color:var(--accent);min-width:50px}
-.week-bar {flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
-.week-bar-fill {height:100%;background:var(--success);border-radius:4px}
-.week-status {font:10px 'JetBrains Mono';color:var(--dim);min-width:60px;text-align:right}
-
-/* Motivation View */
-.quote-card {background:linear-gradient(135deg, var(--surface), var(--surface-2));border:1px solid var(--line);border-radius:var(--r);padding:28px 20px;margin-bottom:14px;text-align:center;min-height:200px;display:flex;flex-direction:column;justify-content:center;align-items:center}
-.quote-text {font-family:Fraunces,serif;font-size:18px;font-style:italic;line-height:1.6;margin-bottom:16px;color:var(--text)}
-.quote-author {font:11px 'JetBrains Mono';color:var(--faint);text-transform:uppercase;letter-spacing:.1em}
-.quote-refresh {margin-top:20px}
-.quote-refresh button {background:var(--accent);color:#12141A;border:0;padding:10px 20px;border-radius:8px;font-weight:600;font-size:12px}
-.quote-refresh button:hover {opacity:.9}
-
-/* Cycle End Modal */
-.cycle-end-modal {position:fixed;top:0;left:0;right:0;bottom:0;background:#0009;display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
-.cycle-end-modal.show {display:flex}
-.cycle-end-content {background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:28px;max-width:420px;text-align:center;box-shadow:0 20px 60px #0009}
-.cycle-end-title {font:24px Fraunces;margin:0 0 12px}
-.cycle-end-result {font:32px Fraunces;color:var(--accent);margin:16px 0;font-weight:600}
-.cycle-end-stats {background:var(--surface-2);border-radius:10px;padding:14px;margin:16px 0;font-size:12px}
-.cycle-end-button {display:flex;gap:8px;margin-top:20px}
-.cycle-end-button button {flex:1;padding:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:8px;font-weight:600;cursor:pointer}
-.cycle-end-button button.primary {background:var(--accent);color:#12141A;border-color:var(--accent)}
-
-/* Bottom Navigation */
-.bottom-nav {position:fixed;z-index:30;bottom:0;left:0;right:0;background:#12141af5;border-top:1px solid var(--line);padding:8px calc(8px + env(safe-area-inset-bottom));backdrop-filter:blur(12px)}
-.nav-inner {max-width:640px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
-.nav-btn {background:none;border:0;color:var(--faint);padding:8px;display:flex;flex-direction:column;gap:4px;align-items:center;cursor:pointer;border-radius:8px;transition:all .2s}
-.nav-btn:hover {background:var(--surface-2)}
-.nav-btn.active {color:var(--accent);background:var(--surface-2)}
-.nav-btn span:first-child {font-size:20px}
-.nav-btn span:last-child {font:9px 'JetBrains Mono';text-transform:uppercase}
-a.nav-btn {text-decoration:none}
-
-/* Toast */
-.toast {position:fixed;left:50%;bottom:90px;transform:translate(-50%,15px);opacity:0;pointer-events:none;background:var(--surface-3);border:1px solid var(--line);padding:10px 16px;border-radius:8px;font:10px 'JetBrains Mono';z-index:50;transition:.2s;max-width:90%}
-.toast.show {opacity:1;transform:translate(-50%,0)}
-
-/* Initialization Modal */
-.init-modal {position:fixed;top:0;left:0;right:0;bottom:0;background:#000d;display:flex;align-items:center;justify-content:center;z-index:200}
-.init-modal.hidden {display:none}
-.init-content {background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:28px;max-width:400px;box-shadow:0 20px 60px #000a}
-.init-title {font:22px Fraunces;margin:0 0 10px}
-.init-desc {font:13px Inter;color:var(--dim);margin:0 0 20px;line-height:1.5}
-.init-form {display:grid;gap:12px}
-.init-form input, .init-form label {font:inherit}
-.init-form input[type="date"] {background:var(--surface-2);border:1px solid var(--line);color:var(--text);padding:10px;border-radius:8px}
-.init-form button {padding:12px;background:var(--accent);color:#12141A;border:0;border-radius:8px;font-weight:600;cursor:pointer}
-.init-form button:hover {opacity:.95}
-
-@media (max-width:480px) {
-  .day-grid {gap:4px}
-  .day-btn {font-size:10px}
-  .quote-card {padding:20px 16px;min-height:160px}
-  .cycle-end-content {padding:20px}
-}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/shared.css">
+<link rel="stylesheet" href="/estoico.css">
 </head>
 <body>
 
@@ -288,25 +143,25 @@ a.nav-btn {text-decoration:none}
 <nav class="bottom-nav">
 <div class="nav-inner">
 <button class="nav-btn active" data-view="registro">
-<span>📅</span>
+<svg class="icon" aria-hidden="true"><use href="#i-cal"/></svg>
 <span>Registro</span>
 </button>
 <button class="nav-btn" data-view="progreso">
-<span>📊</span>
+<svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg>
 <span>Progreso</span>
 </button>
 <button class="nav-btn" data-view="motivacion">
-<span>✦</span>
+<svg class="icon" aria-hidden="true"><use href="#i-quote"/></svg>
 <span>Motivación</span>
 </button>
 <a class="nav-btn" href="/entreno.html">
-<span>🏋️</span>
+<svg class="icon" aria-hidden="true"><use href="#i-dumbbell"/></svg>
 <span>Entreno</span>
 </a>
 </div>
 </nav>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <!-- Initialization Modal -->
 <div class="init-modal" id="init-modal">
@@ -339,7 +194,7 @@ a.nav-btn {text-decoration:none}
 <script src="/shared.js"></script>
 <script>
 'use strict';
-const { ESTOICO_KEY: KEY, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek } = window.EstoicoShared;
+const { ESTOICO_KEY: KEY, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, icon, toast } = window.EstoicoShared;
 const VERSION = 2;
 
 const STOICS = [
@@ -421,7 +276,7 @@ function save() {
     return true;
   } catch(e) {
     console.warn(e);
-    toast('No se pudo guardar. Liberá espacio en el teléfono.');
+    toast('No se pudo guardar. Liberá espacio en el teléfono.', 3200, null);
     return false;
   }
 }
@@ -511,7 +366,7 @@ function canEditDate(dateStr) {
 function toggleHabit(habitId, dateStr) {
   if (!state.cycleStart) return;
   if (!canEditDate(dateStr)) {
-    toast('Solo podés editar hoy y ayer.');
+    toast('Solo podés editar hoy y ayer.', 2400, null);
     return;
   }
   let pos = position(state.cycleStart, dateStr);
@@ -536,14 +391,6 @@ function recalculateWeek(weekNum) {
   let r = computeWeek(weekData.habits);
   weekData.completion = r.completion;
   weekData.points = r.points;
-}
-
-function toast(msg) {
-  let t = $('#toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toast._t);
-  toast._t = setTimeout(() => t.classList.remove('show'), 1800);
 }
 
 // ---------- Render ----------
@@ -659,13 +506,13 @@ function renderDayDetail(dateStr) {
     catHabits.forEach(h => {
       let done = isCompleted(h.id, dateStr);
       habitsHtml += `<div class="habit-row">
-        <span class="habit-icon" aria-hidden="true">${h.icon}</span>
+        <span class="habit-icon" style="--cat:${cat.color}">${icon(h.icon)}</span>
         <div class="habit-info">
           <div class="habit-name">${h.name}</div>
           <div class="habit-meta">Objetivo: ${h.weeklyTarget}x/semana · Peso: ${h.weight}</div>
         </div>
         <button class="habit-check ${done?'done':''} ${!editable?'editing-disabled':''}" data-habit="${h.id}" data-date="${dateStr}" aria-label="${h.name}" aria-pressed="${done}" ${!editable?'disabled':''}>
-          ${done ? '✓' : ''}
+          ${done ? icon('check') : ''}
         </button>
       </div>`;
     });
@@ -741,7 +588,7 @@ function showInitModal() {
   $('#start-cycle').onclick = () => {
     let dateStr = $('#start-date').value;
     if (!dateStr) {
-      toast('Elegí una fecha.');
+      toast('Elegí una fecha.', 2400, null);
       return;
     }
     state.cycleStart = dateStr;
@@ -830,15 +677,6 @@ document.addEventListener('visibilitychange', () => {
 render();
 </script>
 
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch((err) => {
-      console.warn('No se pudo registrar el service worker:', err);
-    });
-  });
-}
-</script>
 
 </body>
 </html>
