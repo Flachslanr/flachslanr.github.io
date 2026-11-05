@@ -153,6 +153,7 @@
 </div>
 
 <script src="/shared.js"></script>
+<script src="/figura-nivel.js"></script>
 <script>
 'use strict';
 const { ESTOICO_KEY: KEY, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, cycleProgress, ring, CHECK_SVG, icon, toast, pop, countUp, confetti, tabs, dialog } = window.EstoicoShared;
@@ -575,7 +576,7 @@ function renderProgreso() {
   $('#level-card').innerHTML = `
     <div class="medal" role="img" aria-label="Nivel ${lvl} de 12">
       <svg class="mr" viewBox="0 0 76 76" aria-hidden="true"><circle class="bgc" cx="38" cy="38" r="34"/><circle class="fg" cx="38" cy="38" r="34" stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 38 38)"/></svg>
-      ${icon('column')}<b aria-hidden="true">${ROMAN[lvl - 1]}</b>
+      ${figuraNivel(lvl)}<b aria-hidden="true">${ROMAN[lvl - 1]}</b>
     </div>
     <div class="level-txt">
       <div class="level-name">${L.name}</div>
