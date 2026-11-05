@@ -19,7 +19,7 @@
   --text:#EDEAE3; --dim:#A9ADB7; --faint:#8A8E99;
   --sand:#E8C9A0; --vital:#22C55E; --on-accent:#12141A; --danger:#E0846F;
   --mente:#8AA9C9; --cuerpo:#93AE86; --alma:#C9A66B;
-  --push:#8AA9C9; --pull:#C9A66B; --legs:#D98C6A; --upper:#B79BD1;
+  --push:#7D93AB; --pull:#A3927A; --legs:#A8877A; --upper:#9A8CAD;
   --serif:'Fraunces',Georgia,serif; --sans:'Inter',-apple-system,system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
   --r-sm:10px; --r:16px; --r-lg:24px; --r-pill:999px;
@@ -111,10 +111,17 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-
 .c[data-v="3"]{background:color-mix(in srgb,var(--accent) 78%,var(--surface-2))}
 .c[data-v="4"]{background:var(--accent)}
 .heat .c.now{outline:2px solid var(--text);outline-offset:1px}
+.heat .c.fut{height:8px;opacity:.45}.heat .wl.fut{font-size:0}
+.heat-sep{grid-column:1/-1;font:500 11px var(--mono);letter-spacing:.1em;color:var(--faint);margin:6px 0 2px;text-transform:uppercase}
 .legend{display:flex;align-items:center;gap:4px;justify-content:flex-end;margin-top:var(--s3);font-size:12px;color:var(--dim)}
 .legend .c{display:inline-block;width:12px;height:12px;border-radius:3px}
 .level{display:flex;gap:var(--s4);align-items:center}
-.medal{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--accent);color:var(--accent);font:500 26px var(--serif);flex:none}
+.medal{width:76px;height:76px;position:relative;flex:none;display:grid;place-items:center;color:var(--accent)}
+.medal svg.mr{position:absolute;inset:0;width:100%;height:100%}
+.medal .mr circle{fill:none;stroke-width:3}
+.medal .mr .fg{stroke:var(--accent);stroke-linecap:round}
+.medal .i{width:30px;height:30px;stroke-width:1.5}
+.medal b{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:var(--surface);padding:0 6px;font:500 11px var(--mono);letter-spacing:.08em;color:var(--accent)}
 .progress{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:var(--s2)}
 .progress i{display:block;height:100%;background:var(--accent);border-radius:3px}
 
@@ -162,8 +169,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-
 /* Rest timer */
 .rest{position:fixed;left:50%;transform:translate(-50%,140%);bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + var(--s3));
   width:min(448px,calc(100% - 32px));z-index:30;background:var(--surface-3);border:1px solid var(--line);border-radius:var(--r-lg);
-  padding:var(--s3);display:flex;align-items:center;gap:var(--s3);box-shadow:0 12px 40px #0008;transition:transform 300ms var(--ease)}
-.rest.show{transform:translate(-50%,0)}
+  padding:var(--s3);display:flex;align-items:center;gap:var(--s3);box-shadow:0 12px 40px #0008;visibility:hidden;transition:transform 300ms var(--ease),visibility 0s 300ms}
+.rest.show{transform:translate(-50%,0);visibility:visible;transition:transform 300ms var(--ease)}
 .rest svg.tr{width:56px;height:56px;flex:none}
 .rest .tr circle{fill:none;stroke-width:5}
 .rest .tr .fg{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset 1s linear}
@@ -258,6 +265,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-
   <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-column" viewBox="0 0 24 24"><path d="M3 4h18M5 7h14M6 20h12M3 22h18M7.5 7v13M10.5 7v13M13.5 7v13M16.5 7v13"/></symbol>
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></symbol>
 </svg>
 
@@ -312,7 +320,11 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-
 
       <div class="section-h"><h2>Tu nivel</h2><span class="eyebrow">5 de 12</span></div>
       <div class="card level">
-        <div class="medal">V</div>
+        <div class="medal" role="img" aria-label="Nivel 5, 62% hacia el siguiente">
+          <svg class="mr" viewBox="0 0 76 76"><circle cx="38" cy="38" r="34" stroke="var(--line)"/><circle class="fg" cx="38" cy="38" r="34" stroke-dasharray="213.6" stroke-dashoffset="81.2" transform="rotate(-90 38 38)"/></svg>
+          <svg class="i"><use href="#i-column"/></svg>
+          <b>V</b>
+        </div>
         <div style="flex:1">
           <div style="font:500 20px var(--serif)">Panecio de Rodas</div>
           <div style="font-size:14px;color:var(--dim)">El puente entre Grecia y Roma. Llevó la Stoa a la vida práctica.</div>
@@ -521,7 +533,7 @@ renderHabits();
 /* ---------- Estoico: heatmap ---------- */
 (function(){const seed=[ [4,4,3,4,3,2,4],[3,4,4,2,4,3,3],[4,4,4,4,4,3,4],[2,3,4,3,2,1,3],[4,4,2,1,0,0,0] ];
   let h='<span></span>'+'LMMJVSD'.split('').map(d=>`<span class="wl" style="text-align:center">${d}</span>`).join('');
-  for(let w=0;w<12;w++){h+=`<span class="wl">${w+1}</span>`;for(let d=0;d<7;d++){const v=seed[w]?seed[w][d]:0;const now=w===4&&d===3;h+=`<span class="c ${now?'now':''}" data-v="${v}" title="Semana ${w+1}"></span>`}}
+  for(let w=0;w<12;w++){const fut=w>4;if(w===5)h+=`<span class="heat-sep">Semanas 6–12</span>`;h+=`<span class="wl${fut?' fut':''}">${w+1}</span>`;for(let d=0;d<7;d++){const v=seed[w]?seed[w][d]:0;const now=w===4&&d===3;h+=`<span class="c ${now?'now':''} ${fut?'fut':''}" data-v="${v}" title="Semana ${w+1}"></span>`}}
   $('#heat').innerHTML=h})();
 
 /* ---------- Estoico: frases (verificadas) ---------- */
