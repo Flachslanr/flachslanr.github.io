@@ -442,14 +442,9 @@ $('#view-ajustes').addEventListener('click', async (ev) => {
   if (id === 'set-inicio') { const v = $('#inicio').value; if (v) { S.inicio = v; guardar(); toast('Inicio actualizado'); renderAll(); } }
   if (id === 'usar-estoico') { const c = cicloEstoico()?.cycleStart; if (c) { S.inicio = c; guardar(); toast('Inicio igualado al de Estoico'); renderAll(); } }
   if (id === 'exp') {
-    const txt = exportar(), nombre = `entreno-${hoyISO()}.json`;
+    const txt = exportar();
     try {
-      const file = new File([txt], nombre, { type: 'application/json' });
-      if (navigator.canShare?.({ files: [file] })) { await navigator.share({ files: [file], title: 'Copia de Entreno' }); return; }
-    } catch (e) { if (e.name === 'AbortError') return; }
-    try {
-      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'application/json' })); a.download = nombre; a.click();
-      toast('Copia descargada');
+      if (await SH.exportFile(txt, `entreno-${hoyISO()}.json`, 'Copia de Entreno') === 'descargado') toast('Copia descargada');
     } catch (e) {
       const t = $('#exp-txt'); t.value = txt; t.hidden = false; t.select(); toast('Copiá el texto y guardalo');
     }

@@ -1,42 +1,55 @@
 /* Estoico — estilos propios. Tokens y componentes comunes en shared.css */
 
-/* ---------- Registro: semana ---------- */
-.weeknav{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--s3)}
-.weeknav-t{text-align:center}
-.weeknav-t p + p{font-size:14px;color:var(--dim);margin-top:2px}
-.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.day{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:72px;padding:8px 0 10px;border-radius:14px;border:1px solid transparent;color:var(--text);
-  transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease)}
-.day .l{font:500 13px var(--sans);font-variant-numeric:lining-nums tabular-nums;color:var(--faint)}
-.day .n{font-size:15px;font-weight:500}
-.day .bar{width:60%;height:4px;margin-top:auto;border-radius:2px;background:var(--line);overflow:hidden}
-.day .bar i{display:block;height:100%;background:var(--accent);border-radius:2px;transition:width 400ms var(--ease)}
-.day.today{border-color:var(--line)}
-.day.today .n{color:var(--accent)}
+/* ---------- Registro: frase del día ---------- */
+.daily{margin:var(--s2) 0 var(--s5)}
+.daily blockquote{font:400 22px/1.32 var(--serif);text-wrap:pretty;max-width:30ch}
+.daily blockquote::before{content:"\201C"}
+.daily blockquote::after{content:"\201D"}
+.daily figcaption{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);margin-top:var(--s1);font-size:var(--fs-xs);color:var(--faint)}
+.daily figcaption .iconbtn{margin-right:-10px;color:var(--faint)}
+.daily figcaption .icon{width:18px;height:18px}
+
+/* ---------- Registro: semana como columnata ---------- */
+.weeknav{display:flex;align-items:center;justify-content:space-between;margin:0 -10px}
+.weeknav-t{text-align:center;font-size:var(--fs-sm);color:var(--dim)}
+.weeknav-t b{font-weight:500;color:var(--text)}
+.colonnade{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:var(--s2);padding-bottom:var(--s3);border-bottom:1px solid var(--line)}
+.day{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;border-radius:12px;color:var(--dim)}
+.day .col{width:30px;height:60px;margin-bottom:6px;overflow:visible}
+.col .stone{fill:var(--surface-3)}
+.col .fill{fill:var(--accent);transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(var(--p,0));transition:transform 450ms var(--ease)}
+.col .flutes{stroke:var(--bg);stroke-width:1;opacity:.45}
+.day.full .col .cap,.day.full .col .base{fill:var(--accent);transition:fill var(--dur) var(--ease)}
+.day .l{font-size:var(--fs-xs);color:var(--faint)}
+.day .n{font:400 17px/1.1 var(--serif);font-variant-numeric:lining-nums tabular-nums}
+.day.today .n{color:var(--text)}
+.day.today .l{color:var(--text)}
 .day.future{opacity:.45}
-.day[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);opacity:1}
-.day[aria-pressed="true"] .l,.day[aria-pressed="true"] .n{color:var(--on-accent)}
-.day[aria-pressed="true"] .l{opacity:.75}
-.day[aria-pressed="true"] .bar{background:#12141A33}
-.day[aria-pressed="true"] .bar i{background:var(--on-accent)}
+/* Día elegido: el número en bronce y una marca debajo */
+.day[aria-pressed="true"] .n{color:var(--accent)}
+.day[aria-pressed="true"]::after{content:"";width:16px;height:2px;border-radius:1px;background:var(--accent);margin-top:4px}
+.day:not([aria-pressed="true"])::after{content:"";height:2px;margin-top:4px}
+.day:active .col{transform:scale(.95)}
 
-/* ---------- Registro: día ---------- */
-.day-card{margin-top:var(--s4)}
-.day-head{display:flex;justify-content:space-between;align-items:center;gap:var(--s3)}
-.day-count{font-size:15px;margin-top:2px}
-.streak .icon{color:var(--accent)}
-.day-card .notice{margin-top:var(--s3)}
+/* ---------- Registro: día elegido ---------- */
+.day-head{display:flex;align-items:baseline;gap:var(--s3);margin-top:var(--s5)}
+.day-head h2{font:400 var(--fs-lg)/1.2 var(--serif);flex:1;min-width:0}
+.day-count{font-size:var(--fs-sm);color:var(--dim);font-variant-numeric:lining-nums tabular-nums}
+.day-count b{font-weight:700;color:var(--text)}
+.streak{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-xs);color:var(--dim);white-space:nowrap}
+.streak .icon{width:16px;height:16px;color:var(--accent)}
+#day-notice .notice{margin-top:var(--s3)}
 
-.cat{margin-top:var(--s4)}
-.cat-h{display:flex;align-items:baseline;gap:8px;margin:0 2px 2px}
-.cat-h span{font:400 17px var(--serif);color:var(--c)}
-.cat-h small{margin-left:auto;font:500 13px var(--sans);font-variant-numeric:lining-nums tabular-nums;color:var(--faint)}
-.habit{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) 0;border-top:1px solid var(--line-soft)}
-.cat-h + .habit{border-top:0}
-.h-ico{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.cat{margin-top:var(--s5)}
+.cat-h{display:flex;align-items:baseline;gap:8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.cat-h h3{font:400 var(--fs-md) var(--serif);color:var(--c)}
+.cat-h small{margin-left:auto;font-size:var(--fs-xs);font-variant-numeric:lining-nums tabular-nums;color:var(--faint)}
+.habit{display:flex;align-items:center;gap:var(--s3);padding:10px 0;border-bottom:1px solid var(--line-soft)}
+.h-ico{width:24px;height:24px;flex:none;color:var(--c)}
+.h-ico .icon{width:24px;height:24px}
 .h-txt{flex:1;min-width:0}
-.h-name{font-size:15px;font-weight:500}
-.h-meta{display:flex;align-items:center;flex-wrap:wrap;column-gap:8px;font-size:13px;color:var(--dim);margin-top:2px}
+.h-name{font-size:var(--fs-md);font-weight:500}
+.h-meta{display:flex;align-items:center;flex-wrap:wrap;column-gap:8px;font-size:var(--fs-xs);color:var(--dim);margin-top:1px}
 .h-meta .met{color:var(--c)}
 .dots{display:inline-flex;gap:3px}
 .dots i{width:6px;height:6px;border-radius:50%;background:var(--line)}
@@ -44,61 +57,85 @@
 
 /* ---------- Progreso ---------- */
 .heat{display:grid;grid-template-columns:22px repeat(7,1fr) 40px;gap:4px;align-items:center}
-.heat .wl{font:500 13px var(--sans);font-variant-numeric:lining-nums tabular-nums;color:var(--faint)}
+.heat .wl{font-size:var(--fs-xs);font-variant-numeric:lining-nums tabular-nums;color:var(--faint)}
 .heat .dl{text-align:center}
-.heat .pc{font:500 13px var(--sans);font-variant-numeric:lining-nums tabular-nums;color:var(--dim);text-align:right}
+.heat .pc{font-size:var(--fs-xs);font-variant-numeric:lining-nums tabular-nums;color:var(--dim);text-align:right}
 .heat .pc.ok{color:var(--success)}
 .heat .pc.low{color:var(--danger)}
-.heat .c{height:20px;border-radius:5px;background:var(--surface-2)}
+.heat .c{height:20px;border-radius:4px;background:var(--surface-2)}
 .heat .c.now{outline:2px solid var(--text);outline-offset:1px}
 .heat .c.fut{height:8px;opacity:.45}
-.heat-sep{grid-column:1/-1;font:500 13px var(--sans);font-variant-numeric:lining-nums tabular-nums;color:var(--faint);margin:6px 0 2px}
+.heat-sep{grid-column:1/-1;font-size:var(--fs-xs);color:var(--faint);margin:6px 0 2px}
 .c[data-v="1"]{background:color-mix(in srgb,var(--accent) 25%,var(--surface-2))}
 .c[data-v="2"]{background:color-mix(in srgb,var(--accent) 50%,var(--surface-2))}
 .c[data-v="3"]{background:color-mix(in srgb,var(--accent) 78%,var(--surface-2))}
 .c[data-v="4"]{background:var(--accent)}
-.legend{display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-top:var(--s3);font-size:12px;color:var(--dim)}
+.legend{display:flex;align-items:center;justify-content:flex-end;gap:4px;margin:var(--s3) 0 var(--s5);font-size:var(--fs-xs);color:var(--dim)}
 .legend .c{display:inline-block;width:12px;height:12px;border-radius:3px}
 .legend .c:not([data-v]){background:var(--surface-2)}
 
-.level{display:flex;align-items:center;gap:var(--s4)}
-.medal{position:relative;width:76px;height:76px;flex:none;display:grid;place-items:center;color:var(--accent)}
+.level{display:flex;align-items:flex-start;gap:var(--s4)}
+.medal{position:relative;width:84px;height:84px;flex:none;display:grid;place-items:center;color:var(--accent)}
 .medal .mr{position:absolute;inset:0;width:100%;height:100%}
 .medal .mr circle{fill:none;stroke-width:3}
 .medal .mr .bgc{stroke:var(--line)}
 .medal .mr .fg{stroke:var(--accent);stroke-linecap:round;animation:medal-in 900ms 120ms var(--ease) both}
 @keyframes medal-in{from{stroke-dashoffset:213.6}}
-.medal > .icon{width:30px;height:30px;stroke-width:1.5}
-.medal > .fig{width:46px;height:46px;margin-top:-2px}
-.medal b{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:var(--surface);padding:0 6px;font:500 13px var(--sans);font-variant-numeric:lining-nums tabular-nums;color:var(--accent)}
+.medal > .fig{width:50px;height:50px;margin-top:-2px}
+.medal b{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);background:var(--bg);padding:0 6px;font:400 15px var(--serif);color:var(--accent)}
 .level-txt{flex:1;min-width:0}
-.level-name{font:500 20px/1.2 var(--serif)}
-.level-desc{font-size:14px;color:var(--dim)}
-.level-week{display:flex;justify-content:space-between;font-size:12px;color:var(--faint);margin:var(--s3) 0 6px}
-.level-hint{font-size:12px;color:var(--faint);margin-top:6px}
-.rules{font-size:12px;color:var(--faint);margin:var(--s3) 2px 0}
+.level-name{font:400 var(--fs-lg)/1.2 var(--serif)}
+.level-desc{font-size:var(--fs-sm);color:var(--dim);line-height:1.35}
+.level-week{display:flex;justify-content:space-between;font-size:var(--fs-xs);color:var(--faint);margin:var(--s3) 0 6px;font-variant-numeric:lining-nums tabular-nums}
+.level-hint{font-size:var(--fs-xs);color:var(--faint);margin-top:6px}
+/* Marca del 85 % sobre la barra de la semana */
+.progress{position:relative;overflow:visible}
+.progress > i{overflow:hidden}
+.progress .mark{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;border-radius:1px;background:var(--text);opacity:.7}
 
-/* ---------- Recordá ---------- */
-.quote{padding:var(--s6) var(--s5)}
-.quote blockquote{margin-top:var(--s4);font:400 26px/1.35 var(--serif);letter-spacing:-.01em;text-wrap:pretty}
-.quote blockquote::before{content:"\201C";display:block;font-size:64px;line-height:.6;color:var(--accent);margin-bottom:var(--s3)}
-.quote figcaption{margin-top:var(--s5)}
-.quote figcaption b{display:block;font-weight:500}
-.quote figcaption span{font-size:13px;color:var(--dim)}
-#new-quote{margin-top:var(--s3)}
+/* El camino: los 12 estoicos */
+.path{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.path li{display:flex;align-items:baseline;gap:var(--s3);padding:10px 0;border-bottom:1px solid var(--line-soft);color:var(--faint)}
+.path .pn{width:34px;flex:none;font:400 15px var(--serif);text-align:right}
+.path b{display:block;font-weight:500;font-size:var(--fs-md)}
+.path small{display:block;font-size:var(--fs-xs);line-height:1.35}
+.path li.done{color:var(--dim)}
+.path li.done .pn{color:var(--accent)}
+.path li.cur{color:var(--text)}
+.path li.cur .pn{color:var(--accent)}
+.path li.cur b{color:var(--accent)}
+.path li.cur small{color:var(--dim)}
+.rules{font-size:var(--fs-xs);color:var(--faint);margin:var(--s3) 0 0;line-height:1.45}
+.tiles{margin-bottom:var(--s2)}
 
-/* ---------- Modales (inicio y fin de ciclo) ---------- */
-.modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;background:#000c}
+/* ---------- Modales (inicio, cierre de semana y fin de ciclo) ---------- */
+.modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;background:#0c0b09e6}
 .modal-card{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:28px 24px;box-shadow:0 20px 60px #000a}
 .modal-card > * + *{margin-top:var(--s3)}
 .modal-ico{width:36px;height:36px;color:var(--accent);stroke-width:1.5}
-.modal-card h2{font:500 26px/1.2 var(--serif)}
-.modal-card p{font-size:14px;color:var(--dim);line-height:1.5}
+.modal-card h2{font:400 28px/1.2 var(--serif)}
+.modal-card p{font-size:var(--fs-sm);color:var(--dim);line-height:1.45}
 .modal-card label{display:block;margin-top:var(--s5)}
 .modal-card .btn-primary{margin-top:var(--s4)}
-.end-result{font:500 30px/1.15 var(--serif);color:var(--accent)}
-.end-stats{background:var(--surface-2);border-radius:var(--r-sm);padding:14px;font-size:14px;color:var(--dim)}
+.end-result{font:400 30px/1.15 var(--serif);color:var(--accent)}
+.end-stats{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;font-size:var(--fs-sm);color:var(--dim)}
 .end-stats strong{color:var(--text)}
 .end-stats div + div{margin-top:6px}
 .end-actions{display:flex;gap:var(--s2);margin-top:var(--s5)!important}
 .end-actions .btn{flex:1}
+
+/* Cierre de semana: el único momento orquestado de la app */
+.week-card{text-align:center}
+.wk-medal{display:grid;place-items:center;margin-bottom:var(--s4)}
+.wk-medal .medal{width:112px;height:112px}
+.wk-medal .medal > .fig{width:66px;height:66px}
+.wk-medal .medal b{background:var(--surface);font-size:17px;bottom:-10px}
+.wk-medal .medal.swap{animation:wk-swap 700ms var(--ease-pop)}
+.wk-medal.down .medal.swap{animation:wk-swap-down 600ms var(--ease)}
+@keyframes wk-swap{0%{transform:scale(.85);opacity:.3}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+@keyframes wk-swap-down{from{transform:scale(1.04);opacity:.4}to{transform:none;opacity:1}}
+.wk-verdict{font-size:var(--fs-md)!important;color:var(--text)!important}
+.wk-desc{margin-top:var(--s1)!important}
+.wk-note{margin:var(--s4) 0 0;padding-top:var(--s4);border-top:1px solid var(--line)}
+.wk-note blockquote{margin:0;font:400 var(--fs-md)/1.4 var(--serif);text-wrap:pretty}
+.wk-note figcaption{margin-top:6px;font-size:var(--fs-xs);color:var(--faint)}

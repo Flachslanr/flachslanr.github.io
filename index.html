@@ -55,8 +55,8 @@
 <header class="top">
 <div class="wrap top-row">
 <div class="top-txt">
-<p class="eyebrow" id="h-eyebrow">Ciclo de 12 semanas</p>
 <h1 class="brand">Estoico</h1>
+<p class="top-sub" id="h-eyebrow">Ciclo de 12 semanas</p>
 </div>
 <div id="h-ring"></div>
 </div>
@@ -66,53 +66,48 @@
 
 <!-- REGISTRO -->
 <section class="view" id="view-registro" role="tabpanel" aria-labelledby="tab-registro">
+<!-- Frase del día: lo primero que se ve -->
+<figure class="daily">
+<blockquote id="quote-text"></blockquote>
+<figcaption><span id="quote-author"></span><button class="iconbtn" id="new-quote" type="button" aria-label="Otra frase"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg></button></figcaption>
+</figure>
+
+<!-- Semana: columnata de 7 días -->
 <div class="weeknav">
 <button class="iconbtn" id="prev-week" type="button" aria-label="Semana anterior"><svg class="icon" aria-hidden="true"><use href="#i-left"/></svg></button>
-<div class="weeknav-t" aria-live="polite">
-<p class="eyebrow" id="week-num">Semana 1</p>
-<p id="week-dates">—</p>
-</div>
+<p class="weeknav-t" aria-live="polite"><b id="week-num">Semana 1</b> <span id="week-dates">—</span></p>
 <button class="iconbtn" id="next-week" type="button" aria-label="Semana siguiente"><svg class="icon" aria-hidden="true"><use href="#i-right"/></svg></button>
 </div>
-<div class="days" id="day-grid"></div>
+<div class="colonnade" id="day-grid"></div>
 
-<div class="card day-card">
+<!-- Día elegido -->
 <div class="day-head">
-<div>
-<p class="eyebrow" id="day-label">Hoy</p>
-<p class="day-count" id="day-count"><b>0</b> de 8 hábitos</p>
-</div>
-<span class="pill streak" id="streak" hidden><svg class="icon" aria-hidden="true"><use href="#i-flame"/></svg><span></span></span>
+<h2 id="day-label">Hoy</h2>
+<p class="day-count" id="day-count"><b>0</b> de 8</p>
+<span class="streak" id="streak" hidden><svg class="icon" aria-hidden="true"><use href="#i-flame"/></svg><span></span></span>
 </div>
 <div id="day-notice"></div>
 <div id="habit-list"></div>
-</div>
 </section>
 
 <!-- PROGRESO -->
 <section class="view" id="view-progreso" role="tabpanel" aria-labelledby="tab-progreso" hidden>
-<div class="tiles" id="prog-tiles"></div>
-
-<div class="section-h"><h2>El ciclo, día por día</h2><span class="eyebrow" id="cycle-dates"></span></div>
-<div class="card">
+<div class="section-h" style="margin-top:var(--s2)"><h2>El ciclo, día por día</h2><span id="cycle-dates"></span></div>
 <div class="heat" id="heat" role="img"></div>
 <div class="legend" aria-hidden="true">Menos <span class="c"></span><span class="c" data-v="1"></span><span class="c" data-v="2"></span><span class="c" data-v="3"></span><span class="c" data-v="4"></span> Más</div>
-</div>
 
-<div class="section-h"><h2>Tu nivel</h2><span class="eyebrow" id="level-of"></span></div>
-<div class="card level" id="level-card"></div>
-<p class="rules">El nivel sube con cada semana que cerrás en 85% o más, se mantiene entre 50 y 84% y baja si la cerrás por debajo del 50%.</p>
+<div class="tiles" id="prog-tiles"></div>
+
+<div class="section-h"><h2>Tu nivel</h2><span id="level-of"></span></div>
+<div class="level" id="level-card"></div>
+
+<div class="section-h"><h2>El camino</h2><span>de Zenón a Marco Aurelio</span></div>
+<ol class="path" id="path"></ol>
+<p class="rules">Cada semana cerrada en 85% o más te hace subir un nivel. Entre 50 y 84% te mantenés, y por debajo del 50% bajás uno.</p>
 </section>
 
-<!-- RECORDÁ -->
-<section class="view" id="view-motivacion" role="tabpanel" aria-labelledby="tab-motivacion" hidden>
-<figure class="card quote">
-<p class="eyebrow">Frase del día</p>
-<blockquote id="quote-text"></blockquote>
-<figcaption id="quote-author"></figcaption>
-</figure>
-<button class="btn btn-ghost btn-block" id="new-quote" type="button"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>Otra frase</button>
-</section>
+<!-- AJUSTES -->
+<section class="view" id="view-ajustes" role="tabpanel" aria-labelledby="tab-ajustes" hidden></section>
 
 </main>
 
@@ -120,7 +115,7 @@
 <div class="tabbar-inner" role="tablist">
 <button class="tab" role="tab" type="button" id="tab-registro" data-view="registro" aria-controls="view-registro" aria-selected="true" tabindex="0"><svg class="icon" aria-hidden="true"><use href="#i-cal"/></svg><span>Registro</span></button>
 <button class="tab" role="tab" type="button" id="tab-progreso" data-view="progreso" aria-controls="view-progreso" aria-selected="false" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg><span>Progreso</span></button>
-<button class="tab" role="tab" type="button" id="tab-motivacion" data-view="motivacion" aria-controls="view-motivacion" aria-selected="false" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-quote"/></svg><span>Recordá</span></button>
+<button class="tab" role="tab" type="button" id="tab-ajustes" data-view="ajustes" aria-controls="view-ajustes" aria-selected="false" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-sliders"/></svg><span>Ajustes</span></button>
 <a class="tab" role="tab" href="/entreno.html" aria-selected="false" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-dumbbell"/></svg><span>Entreno</span></a>
 </div>
 </nav>
@@ -136,6 +131,18 @@
 <label class="eyebrow" for="start-date">¿Cuándo empezás?</label>
 <input class="field" type="date" id="start-date">
 <button class="btn btn-primary btn-lg btn-block" id="start-cycle" type="button">Comenzar</button>
+</div>
+</div>
+
+<!-- Cierre de semana: aparece una vez, al abrir después de que termina una semana -->
+<div class="modal" id="week-modal" role="dialog" aria-modal="true" aria-labelledby="wk-title" aria-describedby="wk-verdict" hidden>
+<div class="modal-card week-card">
+<div class="wk-medal" id="wk-medal"></div>
+<h2 id="wk-title">Semana 1: 0%</h2>
+<p class="wk-verdict" id="wk-verdict"></p>
+<p class="wk-desc" id="wk-desc"></p>
+<figure class="wk-note"><blockquote id="wk-note"></blockquote><figcaption id="wk-src"></figcaption></figure>
+<button class="btn btn-primary btn-lg btn-block" id="wk-ok" type="button">Seguir</button>
 </div>
 </div>
 
@@ -156,7 +163,7 @@
 <script src="/figura-nivel.js"></script>
 <script>
 'use strict';
-const { ESTOICO_KEY: KEY, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, cycleProgress, ring, CHECK_SVG, icon, toast, pop, countUp, confetti, tabs, dialog } = window.EstoicoShared;
+const { ESTOICO_KEY: KEY, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, cycleProgress, ring, CHECK_SVG, icon, toast, pop, countUp, confetti, tabs, dialog, exportFile } = window.EstoicoShared;
 const VERSION = 2;
 
 // Solo estoicos, con la obra y el pasaje de donde sale cada frase.
@@ -207,6 +214,23 @@ const LEVELS = [
   {num:10, name:'Epicteto', desc:'Nació esclavo y enseñó qué depende de nosotros.'},
   {num:11, name:'Junio Rústico', desc:'Le acercó a Marco Aurelio las enseñanzas de Epicteto.'},
   {num:12, name:'Marco Aurelio', desc:'Emperador que se escribía a sí mismo para ser mejor.'}
+];
+
+// Una nota por nivel para el cierre de semana: una cita del estoico si se
+// conserva una verificada; si no, una anécdota con su fuente antigua.
+const LEVEL_NOTES = [
+  ['"El bienestar se alcanza de a poco, y sin embargo no es poca cosa."', 'Zenón, según Diógenes Laercio, Vidas VII 26'],
+  ['"Guiame, Zeus, y vos, Destino, adonde me hayan asignado: los voy a seguir sin dudar."', 'Cleantes, citado en Epicteto, Enquiridión 53'],
+  ['En Atenas se decía que, si no hubiera existido Crisipo, no existiría la Stoa.', 'Diógenes Laercio, Vidas VII 183'],
+  ['En el 155 a. C. llegó a Roma como embajador de Atenas y sus clases llenaron la ciudad de jóvenes.', 'Plutarco, Vida de Catón el Viejo 22'],
+  ['Cicerón escribió Sobre los deberes siguiendo su obra: el libro de ética práctica más leído en Roma.', 'Cicerón, Sobre los deberes I y II'],
+  ['Enfermo de gota, le dio igual una clase a Pompeyo y dijo: "Dolor, no vas a lograr que admita que sos un mal."', 'Cicerón, Disputas tusculanas II 61'],
+  ['Se entrenaba para soportar el calor y la nieve con la cabeza descubierta, y viajaba a pie en cualquier estación.', 'Plutarco, Vida de Catón el Joven 5'],
+  ['"Sufrimos más en la imaginación que en la realidad."', 'Séneca, Cartas a Lucilio 13'],
+  ['"Si hacés algo bueno con esfuerzo, el esfuerzo pasa y el bien queda."', 'Musonio Rufo, Fragmento 51'],
+  ['"No nos perturban las cosas, sino las opiniones que tenemos sobre ellas."', 'Epicteto, Enquiridión 5'],
+  ['"De Rústico aprendí que mi carácter necesitaba corrección y entrenamiento, y por él conocí a Epicteto."', 'Marco Aurelio, Meditaciones I 7'],
+  ['"Basta de discutir cómo tiene que ser un hombre bueno. Selo."', 'Marco Aurelio, Meditaciones X 16']
 ];
 
 const $ = s => document.querySelector(s);
@@ -412,7 +436,7 @@ function renderHeader() {
 }
 
 function switchView(v) {
-  if (!['registro', 'progreso', 'motivacion'].includes(v)) v = 'registro';
+  if (!['registro', 'progreso', 'ajustes'].includes(v)) v = 'registro';
   let changed = state.currentView !== v;
   state.currentView = v;
   save();
@@ -422,7 +446,7 @@ function switchView(v) {
 
   if (v === 'registro') renderRegistro();
   if (v === 'progreso') renderProgreso();
-  if (v === 'motivacion') renderMotivacion();
+  if (v === 'ajustes') renderAjustes();
 }
 
 function renderRegistro() {
@@ -442,31 +466,41 @@ function renderRegistro() {
     selectedDate = weekDates.includes(today) ? today : weekDates[0];
   }
 
+  if (quoteIdx === null) dailyQuote();
   renderDayGrid();
   renderDayDetail(selectedDate);
 }
+
+// Columna dórica de un día: basa, fuste con estrías y capitel. El fuste se
+// llena de bronce desde abajo según el % de hábitos; al 100 % se llena entera.
+const COLUMN_SVG = `<svg class="col" viewBox="0 0 32 64" aria-hidden="true">
+  <rect class="stone cap" x="2" y="2" width="28" height="4" rx="1"/><path class="stone cap" d="M6 6h20l-3 4H9z"/>
+  <rect class="stone" x="9" y="10" width="14" height="44"/><rect class="fill" x="9" y="10" width="14" height="44"/>
+  <path class="flutes" d="M12.5 12v40M16 12v40M19.5 12v40"/>
+  <rect class="stone base" x="6" y="54" width="20" height="4"/><rect class="stone base" x="2" y="58" width="28" height="4" rx="1"/>
+</svg>`;
 
 function renderDayGrid() {
   let weekDates = getWeekDates(getDisplayWeek());
   let today = dateKey();
   let grid = $('#day-grid');
-  // Ancho anterior de cada barra, para que crezca desde ahí en lugar de saltar
+  // Llenado anterior de cada columna, para que suba desde ahí en lugar de saltar
   let prev = {};
-  grid.querySelectorAll('.day').forEach(b => { prev[b.dataset.date] = b.querySelector('.bar i').dataset.p; });
+  grid.querySelectorAll('.day').forEach(b => { prev[b.dataset.date] = b.dataset.p; });
   let pcts = {};
   grid.innerHTML = weekDates.map(d => {
     let date = parseDate(d);
     let pct = pcts[d] = Math.round(dayRatio(d) * 100);
     let from = prev[d] ?? pct;
-    let cls = ['day', d === today ? 'today' : '', dayDiff(today, d) > 0 ? 'future' : ''].join(' ');
-    return `<button class="${cls}" type="button" data-date="${d}" aria-pressed="${d === selectedDate}" aria-label="${shortDate(date, { weekday: 'long', day: 'numeric' })}${d === today ? ', hoy' : ''}, ${pct}%">
+    let cls = ['day', d === today ? 'today' : '', dayDiff(today, d) > 0 ? 'future' : '', pct >= 100 ? 'full' : ''].join(' ');
+    return `<button class="${cls}" type="button" data-date="${d}" data-p="${pct}" style="--p:${from / 100}" aria-pressed="${d === selectedDate}" aria-label="${shortDate(date, { weekday: 'long', day: 'numeric' })}${d === today ? ', hoy' : ''}, ${pct}%">
+      ${COLUMN_SVG}
       <span class="l" aria-hidden="true">${narrowDay(date)}</span>
       <span class="n" aria-hidden="true">${date.getDate()}</span>
-      <span class="bar" aria-hidden="true"><i data-p="${pct}" style="width:${from}%"></i></span>
     </button>`;
   }).join('');
   void grid.offsetWidth;
-  grid.querySelectorAll('.day').forEach(b => { b.querySelector('.bar i').style.width = pcts[b.dataset.date] + '%'; });
+  grid.querySelectorAll('.day').forEach(b => { b.style.setProperty('--p', pcts[b.dataset.date] / 100); });
 }
 
 function renderDayDetail(dateStr) {
@@ -481,14 +515,15 @@ function renderDayDetail(dateStr) {
     : dateStr === yesterday ? 'Ayer, ' + wd
     : shortDate(dateStr, { weekday: 'long', day: 'numeric', month: 'long' });
   let completed = HABITS.filter(h => isCompleted(h.id, dateStr)).length;
-  $('#day-count').innerHTML = `<b>${completed}</b> de ${HABITS.length} hábitos`;
+  $('#day-count').innerHTML = `<b>${completed}</b> de ${HABITS.length}`;
+  $('#day-count').setAttribute('aria-label', `${completed} de ${HABITS.length} hábitos`);
 
   // Racha: el número cuenta hasta el valor nuevo y la píldora rebota si crece
   let n = streak(), pill = $('#streak'), was = pill.hidden ? 0 : Number(pill.dataset.n || 0);
   pill.hidden = n < 2;
   pill.dataset.n = n;
   if (n >= 2) {
-    countUp($('#streak span'), n, v => `Racha de ${v} días`);
+    countUp($('#streak span'), n, v => `${v} días seguidos`);
     if (was && n > was) pop(pill, 'bump');
     else if (!was && streakShown) pop(pill, 'bump');
   }
@@ -509,7 +544,7 @@ function renderDayDetail(dateStr) {
     let catHabits = HABITS.filter(h => h.category === cat.id);
     let doneCount = catHabits.filter(h => isCompleted(h.id, dateStr)).length;
     return `<div class="cat" style="--c:${cat.color}">
-      <div class="cat-h"><span>${cat.label}</span><small>${doneCount}/${catHabits.length}</small></div>` +
+      <div class="cat-h"><h3>${cat.label}</h3><small>${doneCount} de ${catHabits.length}</small></div>` +
       catHabits.map(h => {
         let done = isCompleted(h.id, dateStr);
         let count = (weekHabits[h.id] || []).length;
@@ -527,6 +562,58 @@ function renderDayDetail(dateStr) {
 }
 
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+const MEDAL_C = 213.6; // circunferencia del anillo (r = 34)
+
+// Medalla de nivel: anillo con el avance hacia el 12, la figura y el número romano
+function medalHTML(lvl) {
+  let off = (MEDAL_C * (1 - lvl / 12)).toFixed(1);
+  return `<div class="medal" role="img" aria-label="Nivel ${lvl} de 12, ${LEVELS[lvl - 1].name}">
+    <svg class="mr" viewBox="0 0 76 76" aria-hidden="true"><circle class="bgc" cx="38" cy="38" r="34"/><circle class="fg" cx="38" cy="38" r="34" stroke-dasharray="${MEDAL_C}" stroke-dashoffset="${off}" transform="rotate(-90 38 38)"/></svg>
+    ${figuraNivel(lvl)}<b aria-hidden="true">${ROMAN[lvl - 1]}</b>
+  </div>`;
+}
+
+// ---------- Cierre de semana ----------
+// La primera vez que abrís la app después de que termina una semana, se
+// muestra el resultado y el cambio de nivel (sube, se mantiene o baja).
+function maybeShowWeekClose() {
+  let raw = getRawWeek();
+  if (raw === null || raw < 2 || raw > 12) return; // al terminar el ciclo se encarga el fin de ciclo
+  let closed = raw - 1;
+  if ((state.lastWeekShown || 0) >= closed) return;
+  let pct = computeWeek(getWeekData(closed).habits).completion;
+  let before = state.lastLevelShown ?? levelFromHistory(closed - 1);
+  let after = state.currentLevel;
+  let L = LEVELS[after - 1];
+  state.lastWeekShown = closed;
+  state.lastLevelShown = after;
+  save();
+
+  $('#wk-title').textContent = `Semana ${closed}: ${pct}%`;
+  $('#wk-verdict').textContent = after > before ? `Subís a ${L.name}.`
+    : after < before ? `Bajás a ${L.name}. La semana que viene se recupera.`
+    : `Te mantenés en ${L.name}.` + (pct >= 50 && after < 12 ? ` Con 85% o más subís.` : '');
+  $('#wk-desc').textContent = L.desc;
+  let [note, src] = LEVEL_NOTES[after - 1];
+  $('#wk-note').textContent = note;
+  $('#wk-src').textContent = src;
+
+  // La medalla arranca en el nivel anterior y pasa al nuevo (si cambió)
+  let medal = $('#wk-medal');
+  medal.innerHTML = medalHTML(before);
+  medal.className = 'wk-medal' + (after > before ? ' up' : after < before ? ' down' : '');
+  $('#week-modal').hidden = false;
+  let close = dialog($('#week-modal'), $('#wk-ok'));
+  if (after !== before) {
+    setTimeout(() => {
+      medal.innerHTML = medalHTML(after);
+      pop(medal.querySelector('.medal'), 'swap');
+    }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 700);
+  }
+  let done = () => { $('#week-modal').hidden = true; close(); };
+  $('#wk-ok').onclick = done;
+  $('#week-modal').onkeydown = e => { if (e.key === 'Escape') done(); };
+}
 
 function renderProgreso() {
   if (!state.cycleStart) return;
@@ -570,24 +657,26 @@ function renderProgreso() {
 
   // Nivel
   let lvl = state.currentLevel, L = LEVELS[lvl - 1], next = LEVELS[lvl];
-  let C = 213.6, off = (C * (1 - lvl / 12)).toFixed(1);
   let hint = raw > 12 ? 'Ciclo terminado. Este es tu nivel final.'
     : raw < 1 ? 'El nivel empieza a moverse cuando cierres la primera semana.'
     : !next ? 'Nivel máximo. Cerrá cada semana sobre el 50% para sostenerlo.'
     : `Cerrá esta semana en 85% o más para subir a ${next.name}.`;
   $('#level-of').textContent = `${lvl} de 12`;
   $('#level-card').innerHTML = `
-    <div class="medal" role="img" aria-label="Nivel ${lvl} de 12">
-      <svg class="mr" viewBox="0 0 76 76" aria-hidden="true"><circle class="bgc" cx="38" cy="38" r="34"/><circle class="fg" cx="38" cy="38" r="34" stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 38 38)"/></svg>
-      ${figuraNivel(lvl)}<b aria-hidden="true">${ROMAN[lvl - 1]}</b>
-    </div>
+    ${medalHTML(lvl)}
     <div class="level-txt">
       <div class="level-name">${L.name}</div>
       <div class="level-desc">${L.desc}</div>
       ${raw >= 1 && raw <= 12 ? `<div class="level-week"><span>Semana en curso</span><span>${c}%</span></div>
-      <div class="progress" role="progressbar" aria-label="Semana en curso" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${c}"><i style="width:${Math.min(100, c)}%"></i></div>` : ''}
+      <div class="progress" role="progressbar" aria-label="Semana en curso, la meta para subir es 85%" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${c}"><i style="width:${Math.min(100, c)}%"></i><span class="mark" style="left:${SUBE}%" aria-hidden="true"></span></div>` : ''}
       <p class="level-hint">${hint}</p>
     </div>`;
+
+  // El camino: los 12 estoicos, con los ya alcanzados y el actual marcados
+  $('#path').innerHTML = LEVELS.map(l => {
+    let st = l.num < lvl ? 'done' : l.num === lvl ? 'cur' : '';
+    return `<li class="${st}"${st === 'cur' ? ' aria-current="step"' : ''}><span class="pn" aria-hidden="true">${ROMAN[l.num - 1]}</span><span><b>${l.name}</b><small>${l.desc}</small></span></li>`;
+  }).join('');
 
   renderHeader();
 }
@@ -597,12 +686,10 @@ function showQuote(i) {
   quoteIdx = i;
   let [text, author, source] = STOICS[i];
   $('#quote-text').textContent = text;
-  $('#quote-author').innerHTML = '<b></b><span></span>';
-  $('#quote-author b').textContent = author;
-  $('#quote-author span').textContent = source || '';
+  $('#quote-author').textContent = source ? `${author}, ${source}` : author;
 }
 
-function renderMotivacion() {
+function dailyQuote() {
   if (quoteIdx === null) showQuote(dateKey().split('').reduce((a, c) => a + c.charCodeAt(0), 0) % STOICS.length);
 }
 
@@ -623,6 +710,8 @@ function showInitModal() {
     state.currentLevel = 1;
     state.weeklyData = {};
     state.cycleEndShown = false;
+    state.lastWeekShown = 0;
+    state.lastLevelShown = 1;
     displayWeek = null;
     selectedDate = null;
     save();
@@ -637,6 +726,76 @@ function cycleTotals() {
   for (let w = 1; w <= 12; w++) ws.push(computeWeek(getWeekData(w).habits).completion);
   return { avg: Math.round(ws.reduce((a, c) => a + c, 0) / 12), up: ws.filter(c => c >= SUBE).length, final: ws[11] };
 }
+
+// Guarda el ciclo actual en el historial y deja el registro en cero.
+// Devuelve false si el usuario cancela la confirmación.
+function startNewCycle() {
+  if (!confirm('¿Empezar un ciclo nuevo? El ciclo actual se guarda en el historial y el registro vuelve a cero.')) return false;
+  let archive = (state.archive || []).concat([{
+    cycleStart: state.cycleStart,
+    endedAt: dateKey(),
+    level: state.currentLevel,
+    average: cycleTotals().avg,
+    weeklyData: state.weeklyData
+  }]);
+  state = defaultState();
+  state.archive = archive;
+  displayWeek = null;
+  selectedDate = null;
+  save();
+  return true;
+}
+
+// ---------- Ajustes ----------
+function renderAjustes() {
+  if (!state.cycleStart) return;
+  let start = parseDate(state.cycleStart), raw = getRawWeek();
+  let cycles = (state.archive || []).length;
+  $('#view-ajustes').innerHTML = `
+    <div class="section-h" style="margin-top:0"><h2>Ciclo</h2></div>
+    <div class="settings">
+      <div class="set-row"><div><b>Empezó el ${shortDate(start, { day: 'numeric', month: 'long' })}</b>
+        <span>${raw > 12 ? 'Terminó' : 'Termina'} el ${shortDate(addDays(start, 83), { day: 'numeric', month: 'long' })}</span></div></div>
+      <div class="set-row"><div><b>Empezar un ciclo nuevo</b><span>El actual se guarda en el historial${cycles ? ` (ya hay ${cycles})` : ''}.</span></div>
+        <button class="btn btn-danger" id="new-cycle-btn" type="button">Empezar</button></div>
+    </div>
+    <div class="section-h"><h2>Copia de respaldo</h2></div>
+    <div class="settings">
+      <p class="dim">Tus registros viven solo en este teléfono. Exportá una copia cada tanto y guardala en Archivos o mandátela por mail.</p>
+      <div class="btn-row"><button class="btn btn-primary" id="exp" type="button">Exportar copia</button><button class="btn" id="imp-btn" type="button">Importar copia</button></div>
+      <input type="file" id="imp-file" accept=".json,application/json,text/plain" hidden>
+    </div>
+    <p class="version">Estoico, ciclo de 12 semanas con ${HABITS.length} hábitos</p>`;
+}
+$('#view-ajustes').addEventListener('click', async e => {
+  let id = e.target.closest('button')?.id;
+  if (id === 'new-cycle-btn' && startNewCycle()) showInitModal();
+  if (id === 'imp-btn') $('#imp-file').click();
+  if (id === 'exp') {
+    let txt = JSON.stringify({ app: 'estoico', exportado: new Date().toISOString(), datos: state }, null, 2);
+    try {
+      if (await exportFile(txt, `estoico-${dateKey()}.json`, 'Copia de Estoico') === 'descargado') toast('Copia descargada');
+    } catch (err) { toast('No se pudo exportar la copia en este teléfono.', 3200, null); }
+  }
+});
+$('#view-ajustes').addEventListener('change', async e => {
+  if (e.target.id !== 'imp-file' || !e.target.files[0]) return;
+  try {
+    let j = JSON.parse(await e.target.files[0].text());
+    let d = j && j.app === 'estoico' ? j.datos : null;
+    if (!d || typeof d.weeklyData !== 'object') throw new Error();
+    if (confirm(`La copia es de un ciclo que empezó el ${d.cycleStart ? shortDate(d.cycleStart, { day: 'numeric', month: 'long' }) : '(sin fecha)'}. Va a reemplazar lo que tenés ahora en este teléfono. ¿Seguir?`)) {
+      try { localStorage.setItem(KEY + '.bak-' + Date.now(), JSON.stringify(state)); } catch (_) {}
+      state = { ...defaultState(), ...d };
+      displayWeek = null;
+      selectedDate = null;
+      save();
+      toast('Copia importada');
+      render();
+    }
+  } catch (err) { toast('El archivo no es una copia de Estoico.', 3200, null); }
+  e.target.value = '';
+});
 
 function showCycleEnd() {
   let levelData = LEVELS[state.currentLevel - 1];
@@ -657,21 +816,9 @@ function showCycleEnd() {
   $('#cycle-end-modal').onkeydown = e => { if (e.key === 'Escape') $('#view-summary').click(); };
 
   $('#new-cycle').onclick = () => {
-    if (!confirm('¿Empezar un ciclo nuevo? El ciclo actual se guarda en el historial y el registro vuelve a cero.')) return;
-    let archive = (state.archive || []).concat([{
-      cycleStart: state.cycleStart,
-      endedAt: dateKey(),
-      level: state.currentLevel,
-      average: t.avg,
-      weeklyData: state.weeklyData
-    }]);
+    if (!startNewCycle()) return;
     $('#cycle-end-modal').hidden = true;
     close(false);
-    state = defaultState();
-    state.archive = archive;
-    displayWeek = null;
-    selectedDate = null;
-    save();
     showInitModal();
   };
 
@@ -693,6 +840,7 @@ function render() {
   renderHeader();
   switchView(state.currentView);
   if (getRawWeek() > 12 && !state.cycleEndShown) showCycleEnd();
+  else maybeShowWeekClose();
 }
 
 // Navegación y eventos (se conectan una sola vez)

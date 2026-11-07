@@ -234,6 +234,22 @@
     };
   }
 
+  // ---------- Copia de respaldo ----------
+  // Comparte el archivo (hoja de iOS para guardarlo en Archivos o mandarlo)
+  // o lo descarga. Devuelve 'compartido', 'descargado' o 'cancelado'; si
+  // ninguna vía funciona, lanza un error para que la app muestre el texto.
+  async function exportFile(txt, nombre, titulo) {
+    try {
+      const file = new File([txt], nombre, { type: 'application/json' });
+      if (navigator.canShare?.({ files: [file] })) { await navigator.share({ files: [file], title: titulo }); return 'compartido'; }
+    } catch (e) { if (e.name === 'AbortError') return 'cancelado'; }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([txt], { type: 'application/json' }));
+    a.download = nombre;
+    a.click();
+    return 'descargado';
+  }
+
   // ---------- Aviso (toast) ----------
   // Requiere <div class="toast" id="toast" role="status" aria-live="polite"></div>
   let toastTimer;
@@ -270,5 +286,5 @@
     });
   }
 
-  window.EstoicoShared = { ESTOICO_KEY, DIAS_CICLO, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, cycleProgress, ring, CHECK_SVG, icon, toast, pop, countUp, confetti, reduceMotion, tabs, dialog };
+  window.EstoicoShared = { ESTOICO_KEY, DIAS_CICLO, HABITS, dateKey, parseDate, addDays, dayDiff, weekNumber, position, computeWeek, cycleProgress, ring, CHECK_SVG, icon, toast, pop, countUp, confetti, reduceMotion, tabs, dialog, exportFile };
 })();

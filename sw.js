@@ -3,7 +3,7 @@
 // publicada; si la red no responde en 3 s (o no hay conexión) usa la copia guardada. Las fuentes de Google se guardan
 // aparte para que la tipografía también funcione sin conexión.
 // Subí la versión si cambiás la lista de archivos.
-const CACHE_NAME = 'estoico-v12';
+const CACHE_NAME = 'estoico-v13';
 const NET_TIMEOUT = 3000;
 const FONT_CACHE = 'estoico-fuentes-v1';
 const APP_SHELL = [
