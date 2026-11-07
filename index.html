@@ -101,7 +101,7 @@
 
 <div class="section-h"><h2>Tu nivel</h2><span class="eyebrow" id="level-of"></span></div>
 <div class="card level" id="level-card"></div>
-<p class="rules">El nivel sube con cada semana que cerrás al 100% y baja si la cerrás por debajo del 50%.</p>
+<p class="rules">El nivel sube con cada semana que cerrás en 85% o más, se mantiene entre 50 y 84% y baja si la cerrás por debajo del 50%.</p>
 </section>
 
 <!-- RECORDÁ -->
@@ -285,7 +285,7 @@ function getWeekData(weekNum, create = false) {
   let key = 'week_' + weekNum;
   let wd = state.weeklyData[key];
   if (!wd) {
-    wd = { habits: {}, points: 0, completion: 0 };
+    wd = { habits: {}, completion: 0 };
     if (create) state.weeklyData[key] = wd;
   }
   if (!wd.habits) wd.habits = {};
@@ -302,18 +302,21 @@ function isCompleted(habitId, dateStr) {
 }
 
 // ---------- Nivel ----------
-// El nivel se deriva de las semanas cerradas: sube con una semana al 100 %
-// y baja con una semana por debajo del 50 %. La semana en curso no cuenta.
-function levelFromHistory() {
+// El nivel se deriva de las semanas cerradas, en escalones con margen:
+// sube con 85 % o más, se mantiene entre 50 y 84 % y baja con menos de 50 %.
+// La semana en curso no cuenta.
+const SUBE = 85, BAJA = 50;
+function levelAfter(lvl, completion) {
+  if (completion >= SUBE) return Math.min(12, lvl + 1);
+  if (completion < BAJA) return Math.max(1, lvl - 1);
+  return lvl;
+}
+function levelFromHistory(upTo) {
   let raw = getRawWeek();
   if (raw === null) return 1;
-  let closed = Math.min(12, raw - 1);
+  let closed = Math.min(12, upTo ?? raw - 1);
   let lvl = 1;
-  for (let w = 1; w <= closed; w++) {
-    let c = computeWeek(getWeekData(w).habits).completion;
-    if (c >= 100) lvl = Math.min(12, lvl + 1);
-    else if (c < 50) lvl = Math.max(1, lvl - 1);
-  }
+  for (let w = 1; w <= closed; w++) lvl = levelAfter(lvl, computeWeek(getWeekData(w).habits).completion);
   return lvl;
 }
 
@@ -373,7 +376,6 @@ function recalculateWeek(weekNum) {
   let weekData = getWeekData(weekNum, true);
   let r = computeWeek(weekData.habits);
   weekData.completion = r.completion;
-  weekData.points = r.points;
 }
 
 // Fracción de hábitos cumplidos en un día (0 a 1)
@@ -535,17 +537,18 @@ function renderProgreso() {
   let raw = getRawWeek(), cur = getCurrentWeek(), today = dateKey();
   let weeks = [];
   for (let w = 1; w <= 12; w++) weeks.push(computeWeek(getWeekData(w).habits));
-  let totalPts = weeks.reduce((a, r) => a + r.points, 0);
+  let closedWeeks = weeks.slice(0, Math.max(0, Math.min(12, raw - 1)));
+  let up = closedWeeks.filter(r => r.completion >= SUBE).length;
+  let avg = closedWeeks.length ? Math.round(closedWeeks.reduce((a, r) => a + r.completion, 0) / closedWeeks.length) : null;
   let full = weeks.filter(r => r.completion >= 100).length;
-  let maxPts = HABITS.reduce((a, h) => a + h.weight, 0) * 12;
   let c = weeks[cur - 1].completion;
   // La semana en curso no se compara con la anterior (todavía no terminó)
   let pos = position(state.cycleStart, today);
   let weekTxt = raw < 1 ? 'todavía no empezó' : raw > 12 ? 'última semana' : `en curso · día ${pos.dow + 1} de 7`;
   $('#prog-tiles').innerHTML = `
     <div class="tile"><p class="eyebrow">Semana</p><b>${raw < 1 ? '–' : c + '%'}</b><small>${weekTxt}</small></div>
-    <div class="tile"><p class="eyebrow">Al 100%</p><b>${full}</b><small>${full === 1 ? 'semana completa' : 'semanas completas'}</small></div>
-    <div class="tile"><p class="eyebrow">Puntos</p><b>${totalPts}</b><small>de ${maxPts} posibles</small></div>`;
+    <div class="tile"><p class="eyebrow">Sobre 85%</p><b>${up}</b><small>${up === 1 ? 'semana cerrada' : 'semanas cerradas'}</small></div>
+    <div class="tile"><p class="eyebrow">Promedio</p><b>${avg === null ? '–' : avg + '%'}</b><small>${avg === null ? 'sin semanas cerradas' : 'de las semanas cerradas'}</small></div>`;
 
   // Heatmap de 12 semanas × 7 días, con el % de cada semana a la derecha
   let firstFuture = raw < 1 ? 1 : raw + 1;
@@ -571,7 +574,7 @@ function renderProgreso() {
   let hint = raw > 12 ? 'Ciclo terminado. Este es tu nivel final.'
     : raw < 1 ? 'El nivel empieza a moverse cuando cierres la primera semana.'
     : !next ? 'Nivel máximo. Cerrá cada semana sobre el 50% para sostenerlo.'
-    : `Cerrá esta semana al 100% para subir a ${next.name}.`;
+    : `Cerrá esta semana en 85% o más para subir a ${next.name}.`;
   $('#level-of').textContent = `${lvl} de 12`;
   $('#level-card').innerHTML = `
     <div class="medal" role="img" aria-label="Nivel ${lvl} de 12">
@@ -630,9 +633,9 @@ function showInitModal() {
 }
 
 function cycleTotals() {
-  let points = 0;
-  for (let w = 1; w <= 12; w++) points += computeWeek(getWeekData(w).habits).points;
-  return { points, final: computeWeek(getWeekData(12).habits).completion };
+  let ws = [];
+  for (let w = 1; w <= 12; w++) ws.push(computeWeek(getWeekData(w).habits).completion);
+  return { avg: Math.round(ws.reduce((a, c) => a + c, 0) / 12), up: ws.filter(c => c >= SUBE).length, final: ws[11] };
 }
 
 function showCycleEnd() {
@@ -641,7 +644,7 @@ function showCycleEnd() {
   $('#cycle-end-result').textContent = 'Alcanzaste: ' + levelData.name;
   $('#cycle-end-stats').innerHTML = `
     <div>Completaste <strong>${t.final}%</strong> de la semana final.</div>
-    <div>Puntos totales en el ciclo: <strong>${t.points}</strong></div>
+    <div>Promedio del ciclo: <strong>${t.avg}%</strong>, con <strong>${t.up}</strong> ${t.up === 1 ? "semana" : "semanas"} sobre 85%.</div>
     <div>Nivel alcanzado: <strong>${state.currentLevel} de 12</strong></div>
   `;
 
@@ -659,7 +662,7 @@ function showCycleEnd() {
       cycleStart: state.cycleStart,
       endedAt: dateKey(),
       level: state.currentLevel,
-      points: t.points,
+      average: t.avg,
       weeklyData: state.weeklyData
     }]);
     $('#cycle-end-modal').hidden = true;

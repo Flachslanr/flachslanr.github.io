@@ -110,7 +110,7 @@ export function marcarEnEstoico(fecha) {
     if (!pos) return 'fuera-de-ciclo';
     const k = 'week_' + pos.week;
     st.weeklyData = st.weeklyData || {};
-    const wd = st.weeklyData[k] = st.weeklyData[k] || { habits: {}, points: 0, completion: 0 };
+    const wd = st.weeklyData[k] = st.weeklyData[k] || { habits: {}, completion: 0 };
     wd.habits = wd.habits || {};
     const arr = wd.habits.entrenar = wd.habits.entrenar || [];
     if (arr.includes(pos.dow)) return 'ya-marcado';

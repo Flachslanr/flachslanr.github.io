@@ -10,14 +10,14 @@
   const DIAS_CICLO = 84; // 12 semanas
 
   const HABITS = [
-    { id: 'python', category: 'mente', name: 'Aprender Python', icon: 'code', weeklyTarget: 3, weight: 4 },
-    { id: 'lectura', category: 'mente', name: 'Leer', icon: 'book', weeklyTarget: 3, weight: 4 },
-    { id: 'entrenar', category: 'cuerpo', name: 'Entrenar', icon: 'dumbbell', weeklyTarget: 4, weight: 5 },
-    { id: 'agua', category: 'cuerpo', name: 'Agua +2L', icon: 'drop', weeklyTarget: 7, weight: 5 },
-    { id: 'alcohol', category: 'cuerpo', name: 'No alcohol', icon: 'glass-off', weeklyTarget: 7, weight: 5 },
-    { id: 'azucar', category: 'cuerpo', name: 'No azúcar', icon: 'ban', weeklyTarget: 5, weight: 5 },
-    { id: 'meditar', category: 'alma', name: 'Meditar', icon: 'wind', weeklyTarget: 4, weight: 3 },
-    { id: 'ayudar', category: 'alma', name: 'Ayudar a alguien', icon: 'heart', weeklyTarget: 1, weight: 3 }
+    { id: 'python', category: 'mente', name: 'Aprender Python', icon: 'code', weeklyTarget: 3 },
+    { id: 'lectura', category: 'mente', name: 'Leer', icon: 'book', weeklyTarget: 3 },
+    { id: 'entrenar', category: 'cuerpo', name: 'Entrenar', icon: 'dumbbell', weeklyTarget: 4 },
+    { id: 'agua', category: 'cuerpo', name: 'Agua +2L', icon: 'drop', weeklyTarget: 7 },
+    { id: 'alcohol', category: 'cuerpo', name: 'No alcohol', icon: 'glass-off', weeklyTarget: 7 },
+    { id: 'azucar', category: 'cuerpo', name: 'No azúcar', icon: 'ban', weeklyTarget: 5 },
+    { id: 'meditar', category: 'alma', name: 'Meditar', icon: 'wind', weeklyTarget: 4 },
+    { id: 'regalo', category: 'alma', name: 'Hacer un regalo', icon: 'gift', weeklyTarget: 1 }
   ];
 
   // 'YYYY-MM-DD' en hora local
@@ -55,15 +55,14 @@
     return { week: Math.floor(idx / 7) + 1, dow: idx % 7 };
   }
 
-  // Cumplimiento (%) y puntos de una semana a partir de los días marcados por hábito
+  // Cumplimiento (%) de una semana: promedio de cada hábito respecto de su meta (tope 100)
   function computeWeek(habitsByDay) {
-    let completion = 0, points = 0;
+    let completion = 0;
     HABITS.forEach((h) => {
       const n = ((habitsByDay || {})[h.id] || []).length;
-      if (n >= h.weeklyTarget) points += h.weight;
       completion += Math.min(100, Math.round((n / h.weeklyTarget) * 100)) / HABITS.length;
     });
-    return { completion: Math.round(completion), points };
+    return { completion: Math.round(completion) };
   }
 
   // ---------- Íconos (estilo Lucide, trazo 1.75) ----------
@@ -83,6 +82,7 @@
     'glass-off': '<path d="M8 22h8M12 15v7M7 3h10l-.8 6.5A4.2 4.2 0 0 1 12 15a4.2 4.2 0 0 1-4.2-5.5zM3 3l18 18"/>',
     ban: '<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>',
     wind: '<path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2M9.6 4.6A2 2 0 1 1 11 8H2M12.6 19.4A2 2 0 1 0 14 16H2"/>',
+    gift: '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
     heart: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"/>',
     left: '<path d="m15 18-6-6 6-6"/>',
     right: '<path d="m9 18 6-6-6-6"/>',
