@@ -1,4 +1,4 @@
-"""Genera los íconos y pantallas de inicio de Estoico (columna arena sobre fondo oscuro).
+"""Genera los íconos y pantallas de inicio de Estoico (columna de bronce sobre piedra).
 
 Uso (desde la raíz del repo, requiere Pillow):  python herramientas/generar_iconos.py .
 """
@@ -6,9 +6,9 @@ import sys, os
 from PIL import Image, ImageDraw
 
 OUT = sys.argv[1]
-BG_TOP, BG_BOT = (28, 31, 40), (17, 19, 24)
-FLAT_BG = (18, 20, 26)  # #12141A
-SAND = (232, 201, 160)
+BG_TOP, BG_BOT = (36, 33, 29), (28, 26, 23)  # #24211D a #1C1A17
+FLAT_BG = (28, 26, 23)  # #1C1A17, piedra
+SAND = (184, 148, 99)  # #B89463, bronce
 SS = 4  # supersampling
 
 
