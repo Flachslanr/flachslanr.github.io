@@ -28,7 +28,7 @@ const err = (t) => SH.toast(t, 3200, null);
 // ---------- Encabezado ----------
 function renderHeader() {
   const w = semanaActual(), p = SH.cycleProgress(S.inicio), pct = Math.round(p * 100);
-  $('#h-eyebrow').textContent = `Semana ${w} de ${SEMANAS}`;
+  $('#h-eyebrow').textContent = `Calistenia, semana ${w} de ${SEMANAS}`;
   $('#h-ring').innerHTML = SH.ring(p, pct + '%', `Programa recorrido al ${pct}%`);
 }
 
@@ -59,7 +59,7 @@ function renderSesion() {
   let h = '';
   h += `<div class="chips" role="group" aria-label="Elegir sesión">${SECUENCIA.map((k) => `
     <button class="chip" type="button" style="--c:${DIAS[k].color}" data-dia="${k}" aria-pressed="${k === diaSel}"><span class="dot" aria-hidden="true"></span>${DIAS[k].nombre}<small>${k === prox ? 'próxima' : ''}</small></button>`).join('')}</div>`;
-  h += `<div class="dayhead" style="--c:${D.color}"><p class="eyebrow">${esc(D.nombre)}: ${nEj} ejercicios en ${esc(D.dur)}</p><h2>${esc(D.sub)}</h2></div>`;
+  h += `<div class="dayhead" style="--c:${D.color}"><p class="eyebrow">${esc(D.nombre)}: ${nEj} ejercicios en ${esc(D.dur)}</p><h2>${esc(D.sub).replace(/(\w)-(\w)/g, '$1\u2011$2')}</h2></div>`;
   h += `<div class="phase">${SH.icon('trend')}<div><b>${esc(f.nombre)}.</b> ${esc(f.texto)}</div></div>`;
   h += `<label class="card row-card">Mantener la pantalla encendida<input class="toggle" type="checkbox" id="wake" ${wakeLock ? 'checked' : ''}></label>`;
   h += `<details class="warm"><summary>Calentamiento de 8 a 10 minutos</summary><ul>${D.calent.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></details>`;
@@ -292,7 +292,7 @@ function renderPlan() {
   <div class="section-h" style="margin-top:0"><h2>Las 12 semanas</h2><span class="eyebrow">Hoy: semana ${w}</span></div>
   <div class="card">${FASES.map(([a, b, n, d]) => {
     const now = w >= a && w <= b;
-    return `<div class="ph${now ? ' now' : ''}"><span class="eyebrow">S${a === b ? a : a + '–' + b}</span><div><b>${n}</b>${now ? '<span class="tag">· AHORA</span>' : ''}<p>${d}</p></div></div>`;
+    return `<div class="ph${now ? ' now' : ''}"><span class="eyebrow">Sem. ${a === b ? a : a + '–' + b}</span><div><b>${n}</b>${now ? '<span class="tag">ahora</span>' : ''}<p>${d}</p></div></div>`;
   }).join('')}</div>
   <div class="section-h"><h2>Cómo se ordenan</h2></div>
   <div class="card prose">
