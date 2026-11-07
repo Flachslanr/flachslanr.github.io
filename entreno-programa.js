@@ -40,9 +40,9 @@ const emom = (w) => {
 export const EJ = {
   hs: { n: 'Handstand libre', u: 's', d: 45, rx: { series: 8, lo: 0, hi: 99, texto: '8 intentos' }, sinSugerencia: true,
     yt: 'freestanding handstand tutorial balance', c: 'Dedos activos, hombros empujando al techo, costillas cerradas. Anotá los segundos de cada intento. Para salir, girá una mano.' },
-  lsit: { n: 'L-sit', u: 's', d: 60, rx: (w) => ({ series: 4, lo: 12, hi: 20, texto: w <= 6 ? '4 × 12–20 s · paralelas' : '4 × 12–20 s · soportes' }),
+  lsit: { n: 'L-sit', u: 's', d: 60, rx: (w) => ({ series: 4, lo: 12, hi: 20, texto: w <= 6 ? '4 × 12–20 s en paralelas' : '4 × 12–20 s en soportes' }),
     yt: 'L-sit progression tutorial parallettes', c: 'Hombros abajo, lejos de las orejas. Rodillas bloqueadas, puntas estiradas.', sube: 'sumá 5 s por serie o pasá a los soportes (más bajo, más compresión).' },
-  negpress: { n: 'Negativas de press', u: 'reps', d: 90, rx: { series: 4, lo: 3, hi: 3, texto: '4 × 3 · bajada de 4–5 s' },
+  negpress: { n: 'Negativas de press', u: 'reps', d: 90, rx: { series: 4, lo: 3, hi: 3, texto: '4 × 3, bajada de 4–5 s' },
     yt: 'press to handstand negatives tutorial', c: 'Desde handstand contra la pared (panza a la pared) bajá lento en tuck o straddle hasta quedar sentado en tuck o L.', sube: 'alargá la bajada a 6–8 s o hacelas con piernas en pike.' },
   fondos: { n: 'Fondos en paralelas con chaleco', u: 'reps', d: 120, rx: { series: 4, lo: 6, hi: 8, texto: '4 × 6–8' },
     yt: 'chest dips form tutorial', c: 'Torso inclinado adelante para cargar pecho. Bajá hasta que el hombro pase el codo.', sube: 'sumá 1 serie (5 × 6–8) o hacé la bajada en 3 s.' },
@@ -90,13 +90,13 @@ export const EJ = {
   couch: { n: 'Couch stretch', u: 'ok', d: 0, rx: { series: 1, texto: '2 × 45 s por lado' }, yt: 'couch stretch hip flexor', c: 'Flexor de cadera. Glúteo apretado del lado estirado.' },
   frog: { n: 'Frog stretch', u: 'ok', d: 0, rx: { series: 1, texto: '2 × 60 s' }, yt: 'frog stretch hip mobility', c: 'Mecé la cadera suave adelante y atrás.' },
 
-  pressel: { n: 'Press con pies elevados', u: 'reps', d: 90, rx: (w) => ({ series: 5, lo: 3, hi: 3, texto: w <= 6 ? '5 × 3 · pies en el banco' : '5 × 3 · pies en el suelo, pared atrás' }),
+  pressel: { n: 'Press con pies elevados', u: 'reps', d: 90, rx: (w) => ({ series: 5, lo: 3, hi: 3, texto: w <= 6 ? '5 × 3, pies en el banco' : '5 × 3, pies en el suelo y pared atrás' }),
     yt: 'elevated straddle press handstand drill', c: 'Manos en el piso, caminá las manos cerca, llevá las caderas sobre los hombros y despegá los pies. Straddle al principio.', sube: 'bajá la altura de los pies o probá en pike.' },
   compsop: { n: 'L-sit → tuck → caderas arriba', u: 'reps', d: 90, rx: { series: 4, lo: 3, hi: 3, texto: '4 × 3' },
     yt: 'L sit to tuck press handstand parallettes', c: 'En los soportes: de L-sit recogé a tuck y empujá para subir las caderas lo más alto que puedas.', sube: 'intentá llegar a tuck handstand con la pared como red.' },
   emom: { n: 'EMOM de dominadas', u: 'total', d: 0, rx: emom,
     yt: 'pull up emom workout', c: 'Al inicio de cada minuto hacé las reps indicadas y descansá el resto. Nunca al fallo. Anotá el total de reps.' },
-  negdom: { n: 'Negativas de dominada', u: 'reps', d: 90, rx: { series: 3, lo: 3, hi: 3, texto: '3 × 3 · bajada de 5 s' },
+  negdom: { n: 'Negativas de dominada', u: 'reps', d: 90, rx: { series: 3, lo: 3, hi: 3, texto: '3 × 3, bajada de 5 s' },
     yt: 'negative pull ups tutorial', c: 'Subí con salto o apoyo y bajá en 5 s controlados hasta brazos estirados.', sube: 'hacelas con chaleco.' },
   pseudo: { n: 'Flexiones pseudo planche', u: 'reps', d: 90, rx: { series: 3, lo: 6, hi: 10, texto: '3 × 6–10' },
     yt: 'pseudo planche push ups tutorial', c: 'En los soportes, manos a la altura de la cintura, hombros por delante de las manos.', sube: 'llevá los hombros más adelante de las manos.' },
@@ -134,7 +134,7 @@ export const DIAS = {
     calent: ['Muñecas 2 min, igual que Push A', 'Dislocaciones con banda 2 × 10', 'Dominadas escapulares 2 × 8', 'Flexiones escapulares 2 × 10', '3 kick-ups a la pared'],
     bloques: [
       { t: 'Habilidad', nota: 'La transición por partes', ej: ['hs', 'pressel', 'compsop'] },
-      { t: 'Dominadas · volumen', ej: ['emom', 'negdom'] },
+      { t: 'Dominadas: volumen', ej: ['emom', 'negdom'] },
       { t: 'Empuje complementario', ej: ['pseudo', 'arquera'] },
       { t: 'Abdominales', ej: ['rueda', 'pikelift'] }
     ] }
@@ -156,7 +156,7 @@ export function rx(id, w) {
   const r = typeof e.rx === 'function' ? e.rx(w) : e.rx;
   if (esDescarga(w) && !r.test && r.series > 1 && e.u !== 'ok') {
     const s = Math.max(1, Math.ceil(r.series / 2));
-    return { ...r, series: s, texto: r.texto.replace(/^\d+/, String(s)) + ' · descarga' };
+    return { ...r, series: s, texto: r.texto.replace(/^\d+/, String(s)) + ' (descarga)' };
   }
   return r;
 }

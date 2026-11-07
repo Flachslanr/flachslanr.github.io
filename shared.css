@@ -1,33 +1,35 @@
 /* =====================================================================
-   BASE DE DISEÑO COMPARTIDA — Estoico + Entreno
-   Tokens únicos de color, tipografía, espaciado y movimiento, y los
-   componentes que usan las dos apps (header, tab bar, tarjetas, botones,
-   hoja inferior). Cada app define su acento: arena en Estoico, verde
-   vital en Entreno.
+   BASE DE DISEÑO COMPARTIDA — Estoico + Entreno ("Piedra y bronce")
+   El mundo visual sale de la Stoa: la piedra cálida del pórtico, el bronce
+   de las estatuas y la pátina verde que el bronce toma con el tiempo.
+   Estoico usa bronce como acento y Entreno, pátina (el mismo metal).
+   Tipografía: Marcellus (inscripción romana) para títulos y números;
+   Alegreya Sans (humanista) para la interfaz. Sin mayúsculas decorativas.
    ===================================================================== */
 :root{
   color-scheme:dark;
 
-  /* Superficies */
-  --bg:#12141A; --surface:#1A1D25; --surface-2:#20232D; --surface-3:#262A35;
-  --line:#2A2E38; --line-soft:#22252F; --line-strong:#686D7A;
+  /* Piedra (superficies) */
+  --bg:#1C1A17; --surface:#24211D; --surface-2:#2C2924; --surface-3:#34302A;
+  --line:#3A362F; --line-soft:#2F2B26; --line-strong:#776F63;
 
-  /* Texto (contraste ≥ 4.5:1 sobre --surface) */
-  --text:#EDEAE3; --dim:#A9ADB7; --faint:#8A8E99;
+  /* Mármol (texto; ≥ 4.5:1 sobre todas las superficies) */
+  --text:#ECE6DA; --dim:#A8A195; --faint:#9A9285;
 
-  /* Marca y estados */
-  --sand:#E8C9A0; --vital:#22C55E; --on-accent:#12141A;
-  --accent:var(--sand);
-  --success:#93AE86; --warn:#D9B36C; --danger:#E0846F;
+  /* Metal y estados */
+  --bronce:#B89463; --patina:#78A694; --on-accent:#1C1A17;
+  --accent:var(--bronce);
+  --success:var(--patina); --warn:#D4B06A; --danger:#D98A73;
 
-  /* Categorías de Estoico */
-  --mente:#8AA9C9; --cuerpo:#93AE86; --alma:#C9A66B;
+  /* Pigmentos antiguos para las categorías */
+  --mente:#8FA8CC;   /* lapislázuli */
+  --cuerpo:#A9B27C;  /* olivo */
+  --alma:#C9A2B8;    /* púrpura tirio */
 
   /* Tipografía */
-  --serif:'Fraunces',Georgia,serif;
-  --sans:'Inter',-apple-system,system-ui,sans-serif;
-  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
-  --fs-xs:12px; --fs-sm:13px; --fs-md:15px; --fs-lg:17px;
+  --serif:'Marcellus',Georgia,serif;
+  --sans:'Alegreya Sans',-apple-system,system-ui,sans-serif;
+  --fs-xs:13px; --fs-sm:15px; --fs-md:17px; --fs-lg:22px; --fs-xl:30px; --fs-xxl:40px;
 
   /* Espaciado (ritmo de 4/8) y radios */
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
@@ -43,13 +45,13 @@
   /* Elevación */
   --shadow:0 12px 40px #0008;
 }
-body[data-app="entreno"]{ --accent:var(--vital); --success:var(--vital); }
+body[data-app="entreno"]{ --accent:var(--patina); }
 
 /* ---------- Base ---------- */
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 html{background:var(--bg)}
-body{background:var(--bg);color:var(--text);font:400 16px/1.5 var(--sans);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
+body{background:var(--bg);color:var(--text);font:400 17px/1.45 var(--sans);font-variant-numeric:lining-nums;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
   min-height:100vh;min-height:100dvh;padding-bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + var(--s5))}
 h1,h2,h3,p,figure,blockquote{margin:0}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -62,7 +64,9 @@ button{cursor:pointer;touch-action:manipulation;background:none;border:0;padding
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .icon{width:22px;height:22px;flex:none;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
 .wrap{max-width:var(--wrap);margin:0 auto;padding:0 calc(var(--s4) + env(safe-area-inset-right)) 0 calc(var(--s4) + env(safe-area-inset-left))}
-.eyebrow{font:500 12px/1.35 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+/* Rótulo chico en minúscula de oración (sin mayúsculas ni espaciado decorativo) */
+.eyebrow{font:500 var(--fs-xs)/1.35 var(--sans);color:var(--faint)}
+.num{font-variant-numeric:lining-nums tabular-nums}
 .dim{color:var(--dim)} .faint{color:var(--faint)}
 .up{color:var(--success)} .down{color:var(--danger)}
 .stack > * + *{margin-top:var(--s3)}
@@ -71,25 +75,27 @@ button{cursor:pointer;touch-action:manipulation;background:none;border:0;padding
 .top{position:sticky;top:0;z-index:20;background:linear-gradient(var(--bg) 78%,transparent);padding-top:calc(env(safe-area-inset-top) + var(--s4))}
 .top-row{display:flex;align-items:center;gap:var(--s3);padding-bottom:var(--s4)}
 .top-txt{flex:1;min-width:0}
-.brand{font:500 30px/1.05 var(--serif);letter-spacing:-.01em;margin-top:4px}
+.brand{font:400 var(--fs-xl)/1.05 var(--serif);letter-spacing:.01em}
+.top-sub{font-size:var(--fs-sm);color:var(--dim);margin-top:2px}
 .ring{display:block;width:52px;height:52px;flex:none}
-.ring circle{fill:none;stroke-width:4}
+.ring circle{fill:none;stroke-width:3}
 .ring .bgc{stroke:var(--line)}
 .ring .fg{stroke:var(--accent);stroke-linecap:round}
-.ring text{font:500 12px var(--mono);fill:var(--text)}
+.ring text{font:500 13px var(--sans);font-variant-numeric:lining-nums tabular-nums;fill:var(--text)}
 
 /* ---------- Tarjetas y secciones ---------- */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:var(--s4)}
 .section-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;column-gap:var(--s3);row-gap:2px;margin:var(--s5) 2px var(--s2)}
-.section-h h2,.section-h h3{font:italic 400 20px/1.2 var(--serif)}
+.section-h h2,.section-h h3{font:400 var(--fs-lg)/1.2 var(--serif)}
 .section-h > span{font-size:var(--fs-xs);color:var(--faint)}
 .notice{font-size:var(--fs-sm);color:var(--dim);background:var(--surface-2);border-left:2px solid var(--accent);border-radius:8px;padding:10px 12px}
 
-/* Tiles de estadísticas */
-.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s2)}
-.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:var(--s3);min-width:0}
-.tile b{display:block;font:500 26px/1.1 var(--serif);margin:6px 0 2px;white-space:nowrap}
-.tile b small{font:400 14px var(--sans);color:var(--faint)}
+/* Cifras: una fila de datos separados por líneas finas, sin cajas */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.tile{padding:var(--s3) var(--s3) var(--s3) 0;min-width:0}
+.tile + .tile{border-left:1px solid var(--line);padding-left:var(--s3)}
+.tile b{display:block;font:400 28px/1.1 var(--serif);font-variant-numeric:lining-nums tabular-nums;margin:4px 0 2px;white-space:nowrap}
+.tile b small{font:400 15px var(--sans);color:var(--faint)}
 .tile > small{display:block;font-size:var(--fs-xs);line-height:1.3;color:var(--dim)}
 .tile > small.up{color:var(--success)} .tile > small.down{color:var(--danger)}
 
@@ -100,7 +106,7 @@ button{cursor:pointer;touch-action:manipulation;background:none;border:0;padding
 
 /* ---------- Botones ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);min-height:44px;padding:0 18px;border-radius:var(--r-pill);
-  border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:14px;font-weight:600;text-decoration:none;
+  border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:var(--fs-sm);font-weight:500;text-decoration:none;
   transition:transform var(--dur-fast) var(--ease),background var(--dur-fast),opacity var(--dur-fast)}
 .btn:active{transform:scale(.97)}
 .btn:disabled{opacity:.4;cursor:default;transform:none}
@@ -108,7 +114,7 @@ button{cursor:pointer;touch-action:manipulation;background:none;border:0;padding
 .btn-primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .btn-ghost{background:transparent}
 .btn-danger{color:var(--danger)}
-.btn-lg{min-height:52px;font-size:15px}
+.btn-lg{min-height:52px;font-size:var(--fs-md)}
 .btn-block{display:flex;width:100%}
 .pill{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:var(--r-pill);background:var(--surface);border:1px solid var(--line);
   font-size:var(--fs-sm);font-weight:500;color:var(--dim);text-decoration:none;white-space:nowrap}
@@ -153,10 +159,10 @@ button{cursor:pointer;touch-action:manipulation;background:none;border:0;padding
 textarea.field{min-height:84px;resize:vertical}
 
 /* ---------- Barra de pestañas ---------- */
-.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(18,20,26,.86);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(28,26,23,.88);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);
   border-top:1px solid var(--line-soft);padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 .tabbar-inner{max-width:var(--wrap);margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--tab-h)}
-.tab{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--faint);font-size:12px;font-weight:500;text-decoration:none;transition:color var(--dur-fast)}
+.tab{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--faint);font-size:var(--fs-xs);font-weight:500;text-decoration:none;transition:color var(--dur-fast)}
 .tab .icon{width:24px;height:24px}
 .tab[aria-selected="true"]{color:var(--accent)}
 .tab[aria-selected="true"]::before{content:"";position:absolute;top:0;left:50%;width:28px;height:3px;margin-left:-14px;border-radius:0 0 3px 3px;background:var(--accent);animation:tab-bar var(--dur) var(--ease)}
@@ -165,9 +171,6 @@ textarea.field{min-height:84px;resize:vertical}
 @keyframes tab-bar{from{transform:scaleX(0)}}
 @keyframes tab-ico{0%{transform:scale(.85)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
 
-/* Cambio de vista */
-.view{animation:view-in 260ms var(--ease)}
-@keyframes view-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 /* ---------- Hoja inferior ----------
    Cerrada queda fuera de pantalla y con el atributo inert (sin foco ni lector). */

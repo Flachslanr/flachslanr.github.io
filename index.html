@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#12141A">
+<meta name="theme-color" content="#1C1A17">
 <title>Estoico — 12 Semanas</title>
 
 <!-- Favicon e íconos -->
@@ -46,7 +46,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Marcellus&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/shared.css">
 <link rel="stylesheet" href="/estoico.css">
 </head>
@@ -406,7 +406,7 @@ function renderHeader() {
   if (raw < 1) label = 'Empieza el ' + shortDate(state.cycleStart);
   else if (raw > 12) label = 'Ciclo completado';
   else label = `Semana ${raw} de 12`;
-  $('#h-eyebrow').textContent = `${label} · Nivel ${state.currentLevel}`;
+  $('#h-eyebrow').textContent = raw >= 1 && raw <= 12 ? `${label}, nivel ${LEVELS[state.currentLevel - 1].name}` : label;
   let p = cycleProgress(state.cycleStart), pct = Math.round(p * 100);
   $('#h-ring').innerHTML = ring(p, pct + '%', `Ciclo recorrido al ${pct}%`);
 }
@@ -434,7 +434,7 @@ function renderRegistro() {
 
   $('#prev-week').disabled = week <= 1;
   $('#next-week').disabled = week >= 12;
-  $('#week-num').textContent = `Semana ${week}` + (week === getRawWeek() ? ' · actual' : '');
+  $('#week-num').textContent = week === getRawWeek() ? 'Esta semana' : `Semana ${week}`;
   $('#week-dates').textContent = `${shortDate(weekDates[0])} – ${shortDate(weekDates[6])}`;
 
   // Día seleccionado: hoy si está en esta semana; si no, el primero
@@ -477,8 +477,8 @@ function renderDayDetail(dateStr) {
   let editable = canEditDate(dateStr);
   let wd = shortDate(dateStr, { weekday: 'long', day: 'numeric' });
 
-  $('#day-label').textContent = dateStr === today ? 'Hoy · ' + wd
-    : dateStr === yesterday ? 'Ayer · ' + wd
+  $('#day-label').textContent = dateStr === today ? 'Hoy, ' + wd
+    : dateStr === yesterday ? 'Ayer, ' + wd
     : shortDate(dateStr, { weekday: 'long', day: 'numeric', month: 'long' });
   let completed = HABITS.filter(h => isCompleted(h.id, dateStr)).length;
   $('#day-count').innerHTML = `<b>${completed}</b> de ${HABITS.length} hábitos`;
@@ -544,7 +544,7 @@ function renderProgreso() {
   let c = weeks[cur - 1].completion;
   // La semana en curso no se compara con la anterior (todavía no terminó)
   let pos = position(state.cycleStart, today);
-  let weekTxt = raw < 1 ? 'todavía no empezó' : raw > 12 ? 'última semana' : `en curso · día ${pos.dow + 1} de 7`;
+  let weekTxt = raw < 1 ? 'todavía no empezó' : raw > 12 ? 'última semana' : `en curso, día ${pos.dow + 1} de 7`;
   $('#prog-tiles').innerHTML = `
     <div class="tile"><p class="eyebrow">Semana</p><b>${raw < 1 ? '–' : c + '%'}</b><small>${weekTxt}</small></div>
     <div class="tile"><p class="eyebrow">Sobre 85%</p><b>${up}</b><small>${up === 1 ? 'semana cerrada' : 'semanas cerradas'}</small></div>

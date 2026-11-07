@@ -3,7 +3,7 @@
 // publicada; si la red no responde en 3 s (o no hay conexión) usa la copia guardada. Las fuentes de Google se guardan
 // aparte para que la tipografía también funcione sin conexión.
 // Subí la versión si cambiás la lista de archivos.
-const CACHE_NAME = 'estoico-v11';
+const CACHE_NAME = 'estoico-v12';
 const NET_TIMEOUT = 3000;
 const FONT_CACHE = 'estoico-fuentes-v1';
 const APP_SHELL = [
@@ -28,7 +28,8 @@ const APP_SHELL = [
 const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
+  // cache: 'reload' evita guardar una copia vieja que el navegador tenga en su caché HTTP
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL.map((u) => new Request(u, { cache: 'reload' })))));
   self.skipWaiting();
 });
 
@@ -67,7 +68,9 @@ self.addEventListener('fetch', (event) => {
       return undefined;
     });
 
-  const network = fetch(req).then((res) => {
+  // no-cache: revalida con el servidor (GitHub Pages cachea 10 min) para no mezclar
+  // un HTML nuevo con un CSS o JS viejo; si no cambió, la respuesta es un 304 liviano.
+  const network = fetch(req, { cache: 'no-cache' }).then((res) => {
     if (res.ok) { const copy = res.clone(); event.waitUntil(caches.open(CACHE_NAME).then((c) => c.put(req, copy))); }
     return res;
   });

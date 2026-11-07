@@ -44,7 +44,7 @@ function sugerencia(id, w) {
   if (v.some((x) => x < r.lo)) return { tipo: 'mantener', txt: `Mantené: buscá llegar a ${r.lo} en todas las series.` };
   return { tipo: 'seguir', txt: `Seguí: sumá reps hasta ${r.hi} en todas las series.` };
 }
-const TIP = { sube: 'var(--vital)', mantener: 'var(--warn)', seguir: 'var(--mente)', ok: 'var(--vital)' };
+const TIP = { sube: 'var(--patina)', mantener: 'var(--warn)', seguir: 'var(--mente)', ok: 'var(--patina)' };
 
 // ---------- Vista: sesión ----------
 let diaSel = null;
@@ -59,10 +59,10 @@ function renderSesion() {
   let h = '';
   h += `<div class="chips" role="group" aria-label="Elegir sesión">${SECUENCIA.map((k) => `
     <button class="chip" type="button" style="--c:${DIAS[k].color}" data-dia="${k}" aria-pressed="${k === diaSel}"><span class="dot" aria-hidden="true"></span>${DIAS[k].nombre}<small>${k === prox ? 'próxima' : ''}</small></button>`).join('')}</div>`;
-  h += `<div class="dayhead" style="--c:${D.color}"><p class="eyebrow">${esc(D.nombre)} · ${esc(D.dur)} · ${nEj} ejercicios</p><h2>${esc(D.sub)}</h2></div>`;
+  h += `<div class="dayhead" style="--c:${D.color}"><p class="eyebrow">${esc(D.nombre)}: ${nEj} ejercicios en ${esc(D.dur)}</p><h2>${esc(D.sub)}</h2></div>`;
   h += `<div class="phase">${SH.icon('trend')}<div><b>${esc(f.nombre)}.</b> ${esc(f.texto)}</div></div>`;
   h += `<label class="card row-card">Mantener la pantalla encendida<input class="toggle" type="checkbox" id="wake" ${wakeLock ? 'checked' : ''}></label>`;
-  h += `<details class="warm"><summary>Calentamiento · 8–10 min</summary><ul>${D.calent.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></details>`;
+  h += `<details class="warm"><summary>Calentamiento de 8 a 10 minutos</summary><ul>${D.calent.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></details>`;
   D.bloques.forEach((b) => {
     h += `<div class="section-h"><h3>${esc(b.t)}</h3>${b.nota ? `<span>${esc(b.nota)}</span>` : ''}</div>`;
     b.ej.forEach((id) => { h += tarjeta(id, w, borr[id] || [], D.color); });
@@ -81,7 +81,7 @@ function tarjeta(id, w, dv, color) {
   if (e.u === 'ok') {
     h += `<div class="ok-row"><button class="check" type="button" data-ok="${id}" aria-pressed="${!!dv[0]}" aria-label="${esc(e.n)} hecho">${SH.CHECK_SVG}</button>Hecho</div>`;
   } else {
-    if (last) h += `<p class="prev">Última vez (${fmt(last.fecha)}): <b>${last.v.filter((x) => !vacio(x)).map(num).join(' · ')}</b></p>`;
+    if (last) h += `<p class="prev">Última vez (${fmt(last.fecha)}): <b>${last.v.filter((x) => !vacio(x)).map(num).join(', ')}</b></p>`;
     if (sug) h += `<div class="tip" style="--t:${TIP[sug.tipo]}">${esc(sug.txt).replace(/^(Subí|Mantené|Seguí):/, '<b>$1:</b>')}</div>`;
     const n = r.series, sig = Array.from({ length: n }, (_, i) => i).find((i) => vacio(dv[i]));
     h += `<div class="sets" style="grid-template-columns:repeat(${n <= 6 ? n : Math.ceil(n / 2)},1fr)">`;
@@ -147,7 +147,7 @@ function guardarHoy() {
   const ok = guardarSesion({ id: fecha + '_' + diaSel, fecha, ts: Date.now(), dia: diaSel, semana: w, valores, nota: $('#nota').value.trim() });
   if (!ok) { err('No se pudo guardar. Liberá espacio en el teléfono y probá de nuevo.'); return; }
   const est = marcarEnEstoico(fecha);
-  const msg = { marcado: 'Sesión guardada · "Entrenar" marcado en Estoico', 'ya-marcado': 'Sesión guardada · Estoico ya tenía hoy marcado' }[est] || 'Sesión guardada';
+  const msg = { marcado: 'Sesión guardada. "Entrenar" quedó marcado en Estoico', 'ya-marcado': 'Sesión guardada. Estoico ya tenía hoy marcado' }[est] || 'Sesión guardada';
   toast(msg, 3200);
   diaSel = null; renderAll(); scrollTo({ top: 0 });
 }
@@ -202,7 +202,7 @@ function guardarSerie(conDescanso) {
     SH.confetti(btn);
     toast(`Récord nuevo en ${EJ[id].n}: ${num(v)} ${UNIDAD[EJ[id].u] || EJ[id].u}`, 3600, 'trend');
   }
-  if (conDescanso && EJ[id].d) timer(EJ[id].d, `${EJ[id].n} · serie ${i + 1}`);
+  if (conDescanso && EJ[id].d) timer(EJ[id].d, `${EJ[id].n}, serie ${i + 1}`);
 }
 function paso(dir) {
   const v = leerValor() ?? 0;
@@ -326,7 +326,7 @@ function grafico(pts, { max, meta, unidad = '', etiqueta = 'Evolución', vacioTx
   const ticks = [0, top / 2, top].map((v) => Math.round(v));
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(etiqueta)}">`;
   ticks.forEach((v) => { s += `<line class="g-grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text class="g-axis" x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`; });
-  if (meta) s += `<line class="g-meta" x1="${L}" x2="${W - R}" y1="${y(meta)}" y2="${y(meta)}"/><text class="g-meta-t" x="${L + 4}" y="${y(meta) - 6}" text-anchor="start">META ${meta}</text>`;
+  if (meta) s += `<line class="g-meta" x1="${L}" x2="${W - R}" y1="${y(meta)}" y2="${y(meta)}"/><text class="g-meta-t" x="${L + 4}" y="${y(meta) - 6}" text-anchor="start">Meta ${meta}</text>`;
   if (!pts.length) return s + `<text class="g-empty" x="${(L + W - R) / 2}" y="${H / 2}" text-anchor="middle">${esc(vacioTxt)}</text></svg>`;
   const best = Math.max(...pts.map((p) => p.v)), iPR = pts.findIndex((p) => p.v === best);
   if (pts.length > 1) {
@@ -340,7 +340,7 @@ function grafico(pts, { max, meta, unidad = '', etiqueta = 'Evolución', vacioTx
     const lx = anchor === 'start' ? cx - 4 : anchor === 'end' ? cx + 4 : cx;
     if (pr) {
       s += `<path class="g-pr" d="M${cx} ${cy - 7} L${cx + 7} ${cy} L${cx} ${cy + 7} L${cx - 7} ${cy}Z"/>`;
-      s += `<text class="g-lbl-pr" x="${lx}" y="${cy - 12}" text-anchor="${anchor}">${num(p.v)}${unidad} · récord</text>`;
+      s += `<text class="g-lbl-pr" x="${lx}" y="${cy - 12}" text-anchor="${anchor}">Récord: ${num(p.v)}${unidad}</text>`;
     } else {
       s += `<circle class="g-pt" cx="${cx}" cy="${cy}" r="${muchos ? 3 : 4.5}"/>`;
       if (!muchos || last) s += `<text class="g-lbl" x="${lx}" y="${cy - 10}" text-anchor="${anchor}">${num(p.v)}${unidad}</text>`;
@@ -383,14 +383,14 @@ function renderProgreso() {
   <div class="card">
     <label class="sr-only" for="ex-sel">Ejercicio</label><select id="ex-sel" class="field">${opciones}</select>
     <div class="chart" style="margin-top:var(--s3)">${grafico(serie, { unidad: uEj.trim(), vacioTxt: 'Todavía no lo cargaste en una sesión', etiqueta: 'Mejor serie por sesión: ' + EJ[exGraf].n })}</div>
-    ${serie.length ? `<p class="chart-sum">Mejor: <b>${num(Math.max(...serie.map((p) => p.v)))}${uEj}</b> · última: ${num(serie[serie.length - 1].v)}${uEj} · ${serie.length} ${serie.length === 1 ? 'sesión' : 'sesiones'}</p>` : ''}</div>
+    ${serie.length ? `<p class="chart-sum">Mejor: <b>${num(Math.max(...serie.map((p) => p.v)))}${uEj}</b>. Última: ${num(serie[serie.length - 1].v)}${uEj}. En ${serie.length} ${serie.length === 1 ? 'sesión' : 'sesiones'}</p>` : ''}</div>
   <div class="section-h"><h2>Escalera al handstand</h2><span class="eyebrow">Paso ${nivel} de ${ESCALERA.length}</span></div>
   <div class="card">
     <div class="ladder-bar" aria-hidden="true">${ESCALERA.map((_, i) => `<i class="${i < nivel ? 'on' : ''}"></i>`).join('')}</div>
     <p class="hint" style="margin-bottom:var(--s3)">Tocá el escalón en el que estás.</p>
     <ol class="ladder">${ESCALERA.map((l, i) => { const n = i + 1, cls = n < nivel ? 'done' : n === nivel ? 'cur' : ''; return `<li><button class="${cls}" type="button" data-nivel="${n}" aria-current="${n === nivel ? 'step' : 'false'}"><span class="n">${n < nivel ? SH.icon('check') : n}</span><span><span class="t">${esc(l.t)}</span><span class="cr">${esc(l.cr)}</span></span></button></li>`; }).join('')}</ol></div>
   <div class="section-h"><h2>Historial</h2><span class="eyebrow">${S.sesiones.length} ${S.sesiones.length === 1 ? 'sesión' : 'sesiones'}</span></div>
-  ${hist.length ? `<ul class="hist">${hist.map((s) => { const D = DIAS[s.dia] || { nombre: s.dia, color: 'var(--faint)' }; return `<li style="--c:${D.color}"><span><b>${fmt(s.fecha)}</b> · ${esc(D.nombre)} · sem ${s.semana}${s.nota ? `<span class="note">${esc(s.nota)}</span>` : ''}</span><button class="btn btn-ghost ${delPend === s.id ? 'btn-danger' : ''}" data-del="${esc(s.id)}" type="button">${delPend === s.id ? '¿Borrar?' : 'Borrar'}</button></li>`; }).join('')}</ul>` : '<p class="card empty">Cuando guardes tu primera sesión aparece acá.</p>'}`;
+  ${hist.length ? `<ul class="hist">${hist.map((s) => { const D = DIAS[s.dia] || { nombre: s.dia, color: 'var(--faint)' }; return `<li style="--c:${D.color}"><span><b>${fmt(s.fecha)}</b> ${esc(D.nombre)}, semana ${s.semana}${s.nota ? `<span class="note">${esc(s.nota)}</span>` : ''}</span><button class="btn btn-ghost ${delPend === s.id ? 'btn-danger' : ''}" data-del="${esc(s.id)}" type="button">${delPend === s.id ? '¿Borrar?' : 'Borrar'}</button></li>`; }).join('')}</ul>` : '<p class="card empty">Cuando guardes tu primera sesión aparece acá.</p>'}`;
 }
 $('#view-progreso').addEventListener('change', (ev) => { if (ev.target.id === 'ex-sel') { exGraf = ev.target.value; renderProgreso(); $('#ex-sel').focus(); } });
 $('#view-progreso').addEventListener('click', (ev) => {
@@ -435,7 +435,7 @@ function renderAjustes() {
     <textarea class="field" id="exp-txt" readonly hidden></textarea></div>
   <div class="section-h"><h2>Estoico</h2></div>
   <div class="card"><p class="dim" style="font-size:14px">${estoico && estoico.cycleStart ? `Conectado. Ciclo de Estoico iniciado el ${fmt(estoico.cycleStart)}. Cada sesión guardada marca "Entrenar" ese día.` : 'Todavía no hay un ciclo de Estoico en este teléfono. Empezá uno en Estoico y cada sesión que guardes va a marcar "Entrenar".'}</p></div>
-  <p class="version">Entreno v1.3 · ${S.sesiones.length} ${S.sesiones.length === 1 ? 'sesión guardada' : 'sesiones guardadas'}</p>`;
+  <p class="version">Entreno v1.4, ${S.sesiones.length} ${S.sesiones.length === 1 ? 'sesión guardada' : 'sesiones guardadas'}</p>`;
 }
 $('#view-ajustes').addEventListener('click', async (ev) => {
   const id = ev.target.closest('button')?.id;
@@ -461,7 +461,7 @@ $('#view-ajustes').addEventListener('change', async (ev) => {
   try {
     const d = leerCopia(await ev.target.files[0].text());
     const ok = confirm(`La copia tiene ${d.sesiones.length} sesiones. Va a reemplazar ${S.sesiones.length === 1 ? 'la sesión' : 'las ' + S.sesiones.length + ' sesiones'} que tenés ahora en este teléfono. ¿Seguir?`);
-    if (ok) { const n = aplicarCopia(d); toast(`Copia importada · ${n} sesiones`); renderAll(); }
+    if (ok) { const n = aplicarCopia(d); toast(`Copia importada: ${n} sesiones`); renderAll(); }
   } catch (e) { err(e.message || 'No se pudo leer el archivo'); }
   ev.target.value = '';
 });

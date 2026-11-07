@@ -163,7 +163,7 @@
     const ctx = c.getContext('2d');
     ctx.scale(dpr, dpr);
     const cs = getComputedStyle(document.body);
-    const cols = ['--accent', '--sand', '--vital', '--mente', '--alma', '--text'].map((v) => cs.getPropertyValue(v).trim()).filter(Boolean);
+    const cols = ['--accent', '--bronce', '--patina', '--mente', '--alma', '--text'].map((v) => cs.getPropertyValue(v).trim()).filter(Boolean);
     let ox = W / 2, oy = H * 0.3;
     if (origin) { const r = origin.getBoundingClientRect(); ox = r.left + r.width / 2; oy = r.top + r.height / 2; }
     const P = Array.from({ length: 70 }, (_, i) => {
@@ -257,7 +257,7 @@
     b.id = 'update-pill';
     b.type = 'button';
     b.className = 'update-pill';
-    b.innerHTML = icon('refresh') + '<span>Hay una versión nueva · Actualizar</span>';
+    b.innerHTML = icon('refresh') + '<span>Hay una versión nueva. Actualizar</span>';
     b.onclick = () => location.reload();
     document.body.appendChild(b);
   }
